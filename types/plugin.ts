@@ -13,10 +13,12 @@ export interface PluginKey {
 
 export enum PluginID {
   GOOGLE_SEARCH = 'google-search',
+  FILES_UPLOAD = 'files-upload'
 }
 
 export enum PluginName {
   GOOGLE_SEARCH = 'Google Search',
+  FILES_UPLOAD = 'Files Upload'
 }
 
 export const Plugins: Record<PluginID, Plugin> = {
@@ -33,7 +35,20 @@ export const Plugins: Record<PluginID, Plugin> = {
         value: '',
       },
     ],
-  },
+  }, [PluginID.FILES_UPLOAD]: {
+    id: PluginID.FILES_UPLOAD,
+    name: PluginName.FILES_UPLOAD,
+    requiredKeys: [
+      {
+        key: 'FILES_API_KEY',
+        value: '',
+      },
+      {
+        key: 'FILES_CSE_ID',
+        value: '',
+      },
+    ],
+  }
 };
 
 export const PluginList = Object.values(Plugins);

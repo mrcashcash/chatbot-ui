@@ -19,6 +19,7 @@ import PromptbarContext from './PromptBar.context';
 import { PromptbarInitialState, initialState } from './Promptbar.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import UploadedFile from '../UploadedFiles/Uploadedfiles';
 
 const Promptbar = () => {
   const { t } = useTranslation('promptbar');
@@ -135,6 +136,7 @@ const Promptbar = () => {
           />
         }
         folderComponent={<PromptFolders />}
+        footerComponent={<UploadedFile />}
         items={filteredPrompts}
         searchTerm={searchTerm}
         handleSearchTerm={(searchTerm: string) =>

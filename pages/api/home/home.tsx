@@ -39,6 +39,9 @@ import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 
 import { v4 as uuidv4 } from 'uuid';
+import { UploadFile } from '@/types/uploadfile';
+import UploadedFile from '@/components/UploadedFiles/Uploadedfiles';
+import { saveFiles } from '@/utils/app/files';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -68,7 +71,7 @@ const Home = ({
       conversations,
       selectedConversation,
       prompts,
-      temperature
+      uploadedFiles
     },
     dispatch,
   } = contextValue;
@@ -224,6 +227,22 @@ const Home = ({
     dispatch({ field: 'conversations', value: all });
   };
 
+
+  //  Files Update ------------
+  const handleUpdateUploadedFiles = (newFiles: UploadFile[]) => {
+    const updatedFiles = [...uploadedFiles, ...newFiles];
+    dispatch({ field: 'uploadedFiles', value: updatedFiles });
+
+    saveFiles(newFiles);
+  };
+
+
+  const handleDeleteFile = (fileId: string) => {
+    const updatedFiles = uploadedFiles.filter((file) => file.id !== fileId);
+    dispatch({ field: 'uploadedFiles', value: updatedFiles });
+    saveFiles(updatedFiles)
+  };
+
   // EFFECTS  --------------------------------------------
 
   useEffect(() => {
@@ -296,7 +315,10 @@ const Home = ({
     if (prompts) {
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
     }
-
+    const files = localStorage.getItem('files');
+    if (files) {
+      dispatch({ field: 'uploadedFiles', value: JSON.parse(files) });
+    }
     const conversationHistory = localStorage.getItem('conversationHistory');
     if (conversationHistory) {
       const parsedConversationHistory: Conversation[] =
@@ -351,6 +373,8 @@ const Home = ({
         handleUpdateFolder,
         handleSelectConversation,
         handleUpdateConversation,
+        handleUpdateUploadedFiles,
+        handleDeleteFile,
       }}
     >
       <Head>
@@ -379,7 +403,6 @@ const Home = ({
             <div className="flex flex-1">
               <Chat stopConversationRef={stopConversationRef} />
             </div>
-
             <Promptbar />
           </div>
         </main>

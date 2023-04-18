@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { Prompt } from '@/types/prompt';
 
 import { PromptComponent } from './Prompt';
+import UploadedFile from '@/components/UploadedFiles/Uploadedfiles';
 
 interface Props {
   prompts: Prompt[];

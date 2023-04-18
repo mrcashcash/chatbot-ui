@@ -7,6 +7,7 @@ import { KeyValuePair } from '@/types/data';
 import { FolderType } from '@/types/folder';
 
 import { HomeInitialState } from './home.state';
+import { UploadFile } from '@/types/uploadfile';
 
 export interface HomeContextProps {
   state: HomeInitialState;
@@ -20,6 +21,8 @@ export interface HomeContextProps {
     conversation: Conversation,
     data: KeyValuePair,
   ) => void;
+  handleUpdateUploadedFiles: (newFiles: UploadFile[]) => void;
+  handleDeleteFile: (fileId: string) => void;
 }
 
 const HomeContext = createContext<HomeContextProps>(undefined!);

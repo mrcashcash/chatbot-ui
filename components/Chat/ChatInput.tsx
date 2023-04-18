@@ -1,11 +1,10 @@
 import {
-  IconBolt,
-  IconBrandGoogle,
   IconPlayerStop,
   IconRepeat,
   IconSend,
 } from '@tabler/icons-react';
 import {
+  ChangeEvent,
   KeyboardEvent,
   MutableRefObject,
   useCallback,
@@ -26,6 +25,9 @@ import HomeContext from '@/pages/api/home/home.context';
 import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
+import PluginIconWrapper from './PluginIcon';
+import { UploadFile } from '@/types/uploadfile';
+import UploadedFile from '../UploadedFiles/Uploadedfiles';
 
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
@@ -46,18 +48,19 @@ export const ChatInput = ({
     state: { selectedConversation, messageIsStreaming, prompts },
 
     dispatch: homeDispatch,
+    handleUpdateUploadedFiles
   } = useContext(HomeContext);
 
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [showPromptList, setShowPromptList] = useState(false);
+  const [activeFileIndex, setActiveFileIndex] = useState<number | null>(null);
   const [activePromptIndex, setActivePromptIndex] = useState(0);
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showPluginSelect, setShowPluginSelect] = useState(false);
   const [plugin, setPlugin] = useState<Plugin | null>(null);
-
   const promptListRef = useRef<HTMLUListElement | null>(null);
 
   const filteredPrompts = prompts.filter((prompt) =>
@@ -218,6 +221,11 @@ export const ChatInput = ({
     }
   };
 
+  const handleFileSelect = (index: number) => {
+    setActiveFileIndex(index);
+  };
+
+
   useEffect(() => {
     if (promptListRef.current) {
       promptListRef.current.scrollTop = activePromptIndex * 30;
@@ -228,9 +236,8 @@ export const ChatInput = ({
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
-      textareaRef.current.style.overflow = `${
-        textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
-      }`;
+      textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
+        }`;
     }
   }, [content]);
 
@@ -278,9 +285,9 @@ export const ChatInput = ({
           <button
             className="absolute left-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={() => setShowPluginSelect(!showPluginSelect)}
-            onKeyDown={(e) => {}}
+            onKeyDown={(e) => { }}
           >
-            {plugin ? <IconBrandGoogle size={20} /> : <IconBolt size={20} />}
+            <PluginIconWrapper plugin={plugin} />
           </button>
 
           {showPluginSelect && (
@@ -297,7 +304,6 @@ export const ChatInput = ({
                 onPluginChange={(plugin: Plugin) => {
                   setPlugin(plugin);
                   setShowPluginSelect(false);
-
                   if (textareaRef && textareaRef.current) {
                     textareaRef.current.focus();
                   }
@@ -306,6 +312,7 @@ export const ChatInput = ({
             </div>
           )}
 
+
           <textarea
             ref={textareaRef}
             className="m-0 w-full resize-none border-0 bg-transparent p-0 py-2 pr-8 pl-10 text-black dark:bg-transparent dark:text-white md:py-3 md:pl-10"
@@ -313,11 +320,10 @@ export const ChatInput = ({
               resize: 'none',
               bottom: `${textareaRef?.current?.scrollHeight}px`,
               maxHeight: '400px',
-              overflow: `${
-                textareaRef.current && textareaRef.current.scrollHeight > 400
-                  ? 'auto'
-                  : 'hidden'
-              }`,
+              overflow: `${textareaRef.current && textareaRef.current.scrollHeight > 400
+                ? 'auto'
+                : 'hidden'
+                }`,
             }}
             placeholder={
               t('Type a message or type "/" to select a prompt...') || ''
@@ -350,9 +356,10 @@ export const ChatInput = ({
                 onMouseOver={setActivePromptIndex}
                 promptListRef={promptListRef}
               />
-            </div>
-          )}
 
+            </div>
+
+          )}
           {isModalVisible && (
             <VariableModal
               prompt={prompts[activePromptIndex]}

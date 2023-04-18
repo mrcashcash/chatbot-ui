@@ -35,7 +35,6 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const prompt_tokens = encoding.encode(promptToSend);
-
     let tokenCount = prompt_tokens.length;
     let messagesToSend: Message[] = [];
 
@@ -58,9 +57,9 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error) {
     console.error(error);
     if (error instanceof OpenAIError) {
-      return new Response('Error', { status: 500, statusText: error.message });
+      return new Response('Error TEST AI', { status: 500, statusText: error.message });
     } else {
-      return new Response('Error', { status: 500 });
+      return new Response('Error NODE', { status: 500, });
     }
   }
 };

@@ -21,7 +21,7 @@ import {
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin } from '@/types/plugin';
+import { Plugin, PluginID } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -52,7 +52,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
       messageIsStreaming,
       modelError,
       loading,
-      prompts,
+      prompts
     },
     handleUpdateConversation,
     dispatch: homeDispatch,
@@ -93,6 +93,18 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         });
         homeDispatch({ field: 'loading', value: true });
         homeDispatch({ field: 'messageIsStreaming', value: true });
+        const getPluginKey = (pluginId: PluginID, keyName: string) =>
+          pluginKeys.find((key) => key.pluginId === pluginId)
+            ?.requiredKeys.find((key) => key.key === keyName)?.value;
+
+        const getPluginChatBody = (pluginId: PluginID, chatBody: ChatBody, keys: any[]) => ({
+          ...chatBody,
+          ...keys.reduce((obj: { [x: string]: any; }, key: string | any) => {
+            obj[key] = getPluginKey(pluginId, key);
+            return obj;
+          }, {}),
+        });
+
         const chatBody: ChatBody = {
           model: updatedConversation.model,
           messages: updatedConversation.messages,
@@ -101,20 +113,20 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           temperature: updatedConversation.temperature
         };
         const endpoint = getEndpoint(plugin);
+
         let body;
         if (!plugin) {
           body = JSON.stringify(chatBody);
         } else {
-          body = JSON.stringify({
-            ...chatBody,
-            googleAPIKey: pluginKeys
-              .find((key) => key.pluginId === 'google-search')
-              ?.requiredKeys.find((key) => key.key === 'GOOGLE_API_KEY')?.value,
-            googleCSEId: pluginKeys
-              .find((key) => key.pluginId === 'google-search')
-              ?.requiredKeys.find((key) => key.key === 'GOOGLE_CSE_ID')?.value,
-          });
+          const pluginKeysMap = {
+            'google-search': ['googleAPIKey', 'googleCSEId'],
+            'files-upload': ['googleAPIKey', 'googleCSEId'],
+          };
+          body = JSON.stringify(
+            getPluginChatBody(plugin.id, chatBody, pluginKeysMap[plugin.id] || []),
+          );
         }
+
         const controller = new AbortController();
         const response = await fetch(endpoint, {
           method: 'POST',
@@ -425,14 +437,14 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
                       />
 
                       <TemperatureSlider
-                          label="Temperature"
-                          onChangeTemperature={(temperature) =>
-                            handleUpdateConversation(selectedConversation, {
-                              key: 'temperature',
-                              value: temperature,
-                            })
-                          }
-                        />
+                        label="Temperature"
+                        onChangeTemperature={(temperature) =>
+                          handleUpdateConversation(selectedConversation, {
+                            key: 'temperature',
+                            value: temperature,
+                          })
+                        }
+                      />
                     </div>
                   )}
                 </div>
