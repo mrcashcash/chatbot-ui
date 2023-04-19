@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import HomeContext from '@/pages/api/home/home.context';
 import { FilesList } from './FilesList';
 import { UploadFile } from '@/types/uploadfile';
-import { IconFileUpload, IconUpload } from '@tabler/icons-react';
+import { IconFileUpload, IconUpload, IconFolderPlus } from '@tabler/icons-react';
 import Spinner from '../Spinner';
 
 const fetchFilesList = async () => {
@@ -25,7 +25,7 @@ const fetchFilesList = async () => {
 
 const UploadedFile = () => {
     const { t } = useTranslation('uploadedfiles');
-    const filesListRef = useRef<HTMLUListElement | null>(null);
+    const folderInputRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false);
 
@@ -97,13 +97,22 @@ const UploadedFile = () => {
                     <li className="text-lg font-semibold text-black dark:text-white">
                         Files
                     </li>
-                    <button
-                        type="button"
-                        className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
-                        onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                    >
-                        <IconFileUpload size={24} />
-                    </button>
+                    <div className="flex">
+                        <button
+                            type="button"
+                            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
+                            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                        >
+                            <IconFileUpload size={24} />
+                        </button>
+                        <button
+                            type="button"
+                            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
+                            onClick={() => folderInputRef.current && folderInputRef.current.click()}
+                        >
+                            <IconFolderPlus size={24} />
+                        </button>
+                    </div>
                 </div>
                 {loading ? (
                     <Spinner />
@@ -123,6 +132,15 @@ const UploadedFile = () => {
                 style={{ display: 'none' }}
                 ref={fileInputRef}
                 onChange={handleFileUploadChange}
+            />
+            <input
+                type="file"
+                multiple
+                style={{ display: 'none' }}
+                ref={folderInputRef}
+                disabled={true}
+                onChange={handleFileUploadChange}
+                {...({ webkitdirectory: '' } as any)}
             />
         </div>
 
