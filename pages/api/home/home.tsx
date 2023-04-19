@@ -30,18 +30,14 @@ import { KeyValuePair } from '@/types/data';
 import { FolderInterface, FolderType } from '@/types/folder';
 import { OpenAIModelID, OpenAIModels, fallbackModelID } from '@/types/openai';
 import { Prompt } from '@/types/prompt';
-
 import { Chat } from '@/components/Chat/Chat';
 import { Chatbar } from '@/components/Chatbar/Chatbar';
 import { Navbar } from '@/components/Mobile/Navbar';
 import Promptbar from '@/components/Promptbar';
-
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
-
 import { v4 as uuidv4 } from 'uuid';
 import { UploadFile } from '@/types/uploadfile';
-import UploadedFile from '@/components/UploadedFiles/Uploadedfiles';
 import { saveFiles } from '@/utils/app/files';
 
 interface Props {
@@ -230,19 +226,17 @@ const Home = ({
   };
 
 
-  //  Files Update ------------
-  const handleUpdateUploadedFiles = (newFiles: UploadFile[]) => {
-    const updatedFiles = [...uploadedFiles, ...newFiles];
-    dispatch({ field: 'uploadedFiles', value: updatedFiles });
-
-    saveFiles(newFiles);
+  //  FilesList saved ------------
+  const handleUpdateUploadedFiles = (filesList: UploadFile[]) => {
+    dispatch({ field: 'uploadedFiles', value: filesList });
+    saveFiles(filesList);
   };
 
 
   const handleDeleteFile = (fileId: string) => {
     const updatedFiles = uploadedFiles.filter((file) => file.id !== fileId);
-    dispatch({ field: 'uploadedFiles', value: updatedFiles });
-    saveFiles(updatedFiles)
+    // dispatch({ field: 'uploadedFiles', value: updatedFiles });
+    // saveFiles(updatedFiles)
   };
 
   // EFFECTS  --------------------------------------------

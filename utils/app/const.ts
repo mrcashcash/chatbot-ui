@@ -21,8 +21,10 @@ export const OPENAI_ORGANIZATION =
 
 export const AZURE_DEPLOYMENT_ID =
   process.env.AZURE_DEPLOYMENT_ID || '';
+//Files
 
+export const UPLOAD_DIR = 'uploadedFiles'
 // Store 
 
-export const STORE_PATH = 'uploadedFiles/store/';
+export const STORE_PATH = UPLOAD_DIR + '/store';
 export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || ''

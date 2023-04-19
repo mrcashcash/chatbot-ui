@@ -12,10 +12,11 @@ import { embedDocs, searchQuery } from './vectorStore';
 
 import fs from 'fs';
 import { error } from 'console';
+import { UPLOAD_DIR } from '../app/const';
 
 const embeddings = new OpenAIEmbeddings();
 const model = new OpenAI({ openAIApiKey: process.env.OPENAI_API_KEY, temperature: 0.9 });
-const uploadDir = path.join(process.cwd(), 'uploadedFiles');
+const uploadDir = path.join(process.cwd(), UPLOAD_DIR);
 type FileLoaders = {
     [extension: string]: () => DocumentLoader;
 };

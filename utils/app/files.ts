@@ -5,10 +5,8 @@ export const newFile = (newFile: UploadFile, allFiles: UploadFile[]) => {
         if (c.id === newFile.id) {
             return newFile;
         }
-
         return c;
     });
-
     saveFiles(newFiles);
 
     return {
@@ -18,15 +16,9 @@ export const newFile = (newFile: UploadFile, allFiles: UploadFile[]) => {
 };
 
 export const saveFiles = (files: UploadFile[]) => {
-    const existingFiles = localStorage.getItem('files');
 
-    if (existingFiles && existingFiles !== '[]') {
-        const parsedFiles: UploadFile[] = JSON.parse(existingFiles);
-        const updatedFiles: UploadFile[] = parsedFiles.concat(files);
-        localStorage.setItem('files', JSON.stringify(updatedFiles));
-    } else {
-        localStorage.setItem('files', JSON.stringify(files));
-    }
+    localStorage.setItem('files', JSON.stringify(files));
+
 };
 
 

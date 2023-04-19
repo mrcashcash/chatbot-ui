@@ -35,27 +35,24 @@ export const FilesList: FC<Props> = ({
         'txt': <IconTxt />,
         'epub': <IconTxt />,
         'pdf': <IconPdf />,
-        // 'doc': <IconWord />,
-        // 'docx': <IconWord />,
-        // 'xls': <IconExcel />,
-        // 'xlsx': <IconExcel />,
-        // 'ppt': <IconPowerPoint />,
-        // 'pptx': <IconPowerPoint />,
-        // 'jpg': <IconImage />,
-        // 'jpeg': <IconImage />,
-        // 'png': <IconImage />,
-        // 'gif': <IconImage />,
-        // 'svg': <IconImage />,
-        // 'mp3': <IconAudio />,
-        // 'wav': <IconAudio />,
-        // 'mp4': <IconVideo />,
-        // 'zip': <IconZip />,
-        // Add more file extensions and their corresponding icons here
     };
-    const getFileExtension = (filename: string): string => {
+    const getFileExtension = (filename?: string): string => {
+        if (!filename) {
+            console.error('Undefined or empty filename');
+            return '';
+        }
+
+        // Check for a valid filename using a regular expression
+        const validFilenameRegex = /^[^\\/:\*\?"<>\|]+$/;
+        if (!validFilenameRegex.test(filename)) {
+            console.error('Invalid filename:', filename);
+            return '';
+        }
+
         const parts = filename.split('.');
         return parts.length > 1 ? (parts.pop()?.toLowerCase() || '') : '';
     };
+
     const renderIcon = (filename: string) => {
         const fileExtension = getFileExtension(filename);
         return fileTypeIcons[fileExtension] || <IconFileUnknown />;

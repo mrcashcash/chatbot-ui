@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useRef } from 'react';
+import { ChangeEvent, useContext, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import HomeContext from '@/pages/api/home/home.context';
@@ -6,6 +6,21 @@ import { FilesList } from './FilesList';
 import { UploadFile } from '@/types/uploadfile';
 import { IconFileUpload, IconUpload } from '@tabler/icons-react';
 
+const fetchFilesList = async () => {
+    try {
+        const response = await fetch('/api/getFilesList');
+        if (response.ok) {
+            const filesList = await response.json();
+            return filesList;
+        } else {
+            console.error('Failed to fetch files list.');
+            return [];
+        }
+    } catch (error) {
+        console.error('Error fetching files list:', error);
+        return [];
+    }
+};
 
 const UploadedFile = () => {
     const { t } = useTranslation('uploadedfiles');
@@ -39,9 +54,6 @@ const UploadedFile = () => {
                 acc.push(newFile);
                 return acc;
             }, []);
-
-
-
             try {
                 const response = await fetch('/api/uploadFiles', {
                     method: 'POST',
@@ -59,6 +71,14 @@ const UploadedFile = () => {
             }
         }
     };
+    useEffect(() => {
+        const loadFilesList = async () => {
+            const filesList = await fetchFilesList();
+            handleUpdateUploadedFiles(filesList);
+        };
+
+        loadFilesList();
+    }, []);
     return (
         <div className="flex w-full flex-col gap-1">
             <ul className="z-10 max-h-max w-full overflow-scroll rounded bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-neutral-500 dark:bg-[#343541] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]">
@@ -74,9 +94,10 @@ const UploadedFile = () => {
                         <IconFileUpload size={24} />
                     </button>
                 </div>
-                {uploadedFiles.map((file, index) => (
-                    <FilesList key={index} file={file} index={index} />
-                ))}
+                {uploadedFiles && uploadedFiles.length > 0 &&
+                    uploadedFiles.map((file, index) => (
+                        <FilesList key={index} file={file} index={index} />
+                    ))}
             </ul>
             <input
                 type="file"

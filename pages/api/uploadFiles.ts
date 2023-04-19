@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { processingData } from '@/utils/server/llm';
+import { UPLOAD_DIR } from '@/utils/app/const';
 
 
 export const config = {
@@ -14,8 +15,8 @@ export const config = {
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     try {
-        const form = new formidable.IncomingForm({ uploadDir: 'uploadedFiles', keepExtensions: true, multiples: true });
-        const uploadDir = path.join(process.cwd(), 'uploadedFiles');
+        const form = new formidable.IncomingForm({ uploadDir: UPLOAD_DIR, keepExtensions: true, multiples: true });
+        const uploadDir = path.join(process.cwd(), UPLOAD_DIR);
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir);
         }
@@ -46,8 +47,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
                     fs.renameSync(oldPath, newPath);
                 });
             });
-            const resp = processingData(files_array)
-            res.status(200).json({ fields, files });
+            const resp = processingData(files_array);
+            const fileNames = fs.readdirSync(uploadDir);
+            const filesOnly = fileNames.filter((name) => {
+                const filePath = path.join(uploadDir, name);
+                return fs.statSync(filePath).isFile();
+            });
+            res.status(200).json({ updatedfiles: files_array, allfiles: filesOnly });
         });
     } catch (error) {
         console.error(error);

@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import pdfParse from 'pdf-parse';
+import { UPLOAD_DIR } from '../app/const';
 
-const uploadDir = path.join(process.cwd(), 'uploadedFiles');
+const uploadDir = path.join(process.cwd(), UPLOAD_DIR);
 
 const readFile = (filepath: fs.PathOrFileDescriptor) => {
     return new Promise<string>((resolve, reject) => {
