@@ -1,10 +1,10 @@
-import { ChangeEvent, useContext, useEffect, useRef } from 'react';
+import { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import HomeContext from '@/pages/api/home/home.context';
 import { FilesList } from './FilesList';
 import { UploadFile } from '@/types/uploadfile';
 import { IconFileUpload, IconUpload } from '@tabler/icons-react';
+import Spinner from '../Spinner';
 
 const fetchFilesList = async () => {
     try {
@@ -22,11 +22,12 @@ const fetchFilesList = async () => {
     }
 };
 
+
 const UploadedFile = () => {
     const { t } = useTranslation('uploadedfiles');
     const filesListRef = useRef<HTMLUListElement | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
+    const [loading, setLoading] = useState(false);
 
     const {
         state: { uploadedFiles },
@@ -61,8 +62,8 @@ const UploadedFile = () => {
                 });
 
                 if (response.ok) {
-                    console.log('Files uploaded successfully.');
-                    handleUpdateUploadedFiles(newFiles);
+                    const { _, allfiles } = await response.json()
+                    handleUpdateUploadedFiles(allfiles as UploadFile[]);
                 } else {
                     console.error('Failed to upload files.');
                 }
@@ -73,8 +74,18 @@ const UploadedFile = () => {
     };
     useEffect(() => {
         const loadFilesList = async () => {
-            const filesList = await fetchFilesList();
-            handleUpdateUploadedFiles(filesList);
+            setLoading(true);
+            try {
+                const fileslist = await fetchFilesList();
+                handleUpdateUploadedFiles(fileslist);
+
+                // const filesList = await fetchFilesList();
+                // handleUpdateUploadedFiles(filesList);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
         };
 
         loadFilesList();
@@ -94,10 +105,17 @@ const UploadedFile = () => {
                         <IconFileUpload size={24} />
                     </button>
                 </div>
-                {uploadedFiles && uploadedFiles.length > 0 &&
-                    uploadedFiles.map((file, index) => (
-                        <FilesList key={index} file={file} index={index} />
-                    ))}
+                {loading ? (
+                    <Spinner />
+                ) : (
+                    uploadedFiles && uploadedFiles.length > 0 ? (
+                        uploadedFiles.map((file, index) => (
+                            <FilesList key={index} file={file} index={index} />
+                        ))
+                    ) : (
+                        <div>No files.</div>
+                    )
+                )}
             </ul>
             <input
                 type="file"

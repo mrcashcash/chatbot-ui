@@ -5,6 +5,7 @@ import path from 'path';
 
 import { processingData } from '@/utils/server/llm';
 import { UPLOAD_DIR } from '@/utils/app/const';
+import { UploadFile } from '@/types/uploadfile';
 
 
 export const config = {
@@ -53,7 +54,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
                 const filePath = path.join(uploadDir, name);
                 return fs.statSync(filePath).isFile();
             });
-            res.status(200).json({ updatedfiles: files_array, allfiles: filesOnly });
+            const uploadFilesList: UploadFile[] = filesOnly.map((fileName) => {
+                const filePath = path.join(uploadDir, fileName);
+                const fileStats = fs.statSync(filePath);
+
+                return {
+                    id: fileName,
+                    name: fileName,
+                    size: fileStats.size,
+                    type: '', // You can use a library like 'mime-types' to detect the file type based on the file extension.
+                };
+            });
+            res.status(200).json({ updatedfiles: files_array, allfiles: uploadFilesList });
         });
     } catch (error) {
         console.error(error);
