@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { processingData } from '@/utils/server/llm';
-import { UPLOAD_DIR } from '@/utils/app/const';
+import { MSG_TYPE, UPLOAD_DIR } from '@/utils/app/const';
 import { UploadFile } from '@/types/uploadfile';
 
 
@@ -48,7 +48,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
                     fs.renameSync(oldPath, newPath);
                 });
             });
-            const resp = processingData(files_array);
+            const resp = processingData(MSG_TYPE.FILES, files_array);
             const fileNames = fs.readdirSync(uploadDir);
             const filesOnly = fileNames.filter((name) => {
                 const filePath = path.join(uploadDir, name);

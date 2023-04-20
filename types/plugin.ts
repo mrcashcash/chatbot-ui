@@ -13,12 +13,14 @@ export interface PluginKey {
 
 export enum PluginID {
   GOOGLE_SEARCH = 'google-search',
-  FILES_UPLOAD = 'files-upload'
+  FILES_UPLOAD = 'files-upload',
+  WEB_SCRAPE = 'web-scrape'
 }
 
 export enum PluginName {
   GOOGLE_SEARCH = 'Google Search',
-  FILES_UPLOAD = 'Files Upload'
+  FILES_UPLOAD = 'Talk to Db',
+  WEB_SCRAPE = 'Web Scrape'
 }
 
 export const Plugins: Record<PluginID, Plugin> = {
@@ -45,6 +47,19 @@ export const Plugins: Record<PluginID, Plugin> = {
       },
       {
         key: 'FILES_CSE_ID',
+        value: '',
+      },
+    ],
+  }, [PluginID.WEB_SCRAPE]: {
+    id: PluginID.WEB_SCRAPE,
+    name: PluginName.WEB_SCRAPE,
+    requiredKeys: [
+      {
+        key: 'WEB_SCRAPE_API_KEY',
+        value: '',
+      },
+      {
+        key: 'WEB_SCRAPE_CSE_ID',
         value: '',
       },
     ],

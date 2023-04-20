@@ -1,45 +1,9 @@
 import fs from 'fs';
-import path from 'path';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { Document } from 'langchain/document';
 import { HNSWLib } from 'langchain/vectorstores/hnswlib';
 import { OPENAI_API_KEY, STORE_PATH } from '../app/const';
 
-// const vectorStore = async () => {
-
-//     let vectorStore: HNSWLib = new HNSWLib(new OpenAIEmbeddings({ openAIApiKey: OPENAI_API_KEY }), { "space": "cosine", "numDimensions": 1536 });
-
-//     // Check if STORE_PATH exists and has files inside
-//     if (fs.existsSync(STORE_PATH) && fs.readdirSync(STORE_PATH).length > 0) {
-//         console.log('Loading existing vector store from:', STORE_PATH);
-//         vectorStore = await HNSWLib.load(
-//             STORE_PATH,
-//             new OpenAIEmbeddings()
-//         );
-//     } else {
-//         console.log('Creating a new vector store');
-
-//     }
-//     return vectorStore
-
-// };
-
-
-// export const embeddDocs = async (docs: Document[]) => {
-
-//     const vs = await vectorStore();
-//     await vs.addDocuments(docs);
-//     vs.save(STORE_PATH);
-//     console.log('Docs added to VectorStore and Saved...')
-// }
-
-// export const storeQuery = async (query: string) => {
-//     const vs = await vectorStore();
-//     const docs: Document[] = await vs.similaritySearch(query, 2)
-//     return docs
-// }
-
-// export default vectorStore;
 const directoryExistsAndNotEmpty = (path: string): boolean => {
     if (!fs.existsSync(path)) {
         fs.mkdirSync(path);
@@ -58,7 +22,7 @@ export const embedDocs = async (docs: Document[]): Promise<void> => {
 
 export const searchQuery = async (query: string): Promise<Document[]> => {
     const vs = await VectorStore.getInstance();
-    const docs: Document[] = await vs.similaritySearch(query, 2);
+    const docs: Document[] = await vs.similaritySearch(query, 3);
     return docs;
 };
 

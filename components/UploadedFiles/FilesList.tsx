@@ -1,6 +1,6 @@
 import { FC, MutableRefObject, MouseEventHandler, useState, useContext } from 'react';
 
-import { IconTxt, IconFileUnknown, IconCheck, IconX, IconTrash, IconPdf } from '@tabler/icons-react';
+import { IconTxt, IconFileUnknown, IconCheck, IconX, IconTrash, IconPdf, IconExternalLink } from '@tabler/icons-react';
 import { FileTypeIcons, UploadFile } from '@/types/uploadfile';
 import SidebarActionButton from '../Buttons/SidebarActionButton';
 import HomeContext from '@/pages/api/home/home.context';
@@ -35,6 +35,7 @@ export const FilesList: FC<Props> = ({
         'txt': <IconTxt />,
         'epub': <IconTxt />,
         'pdf': <IconPdf />,
+        'lnk': <IconExternalLink />
     };
     const getFileExtension = (filename?: string): string => {
         if (!filename) {

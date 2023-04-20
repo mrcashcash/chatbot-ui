@@ -1,6 +1,6 @@
 // PluginIconWrapper.tsx
 import React from 'react';
-import { IconBrandGoogle, IconBolt, IconFiles } from '@tabler/icons-react';
+import { IconBrandGoogle, IconBolt, IconFiles, IconWebhook } from '@tabler/icons-react';
 import { Plugin } from '@/types/plugin';
 
 
@@ -14,6 +14,8 @@ const PluginIconWrapper: React.FC<PluginIconWrapperProps> = ({ plugin }) => {
             return <IconBrandGoogle size={20} />;
         } else if (plugin.id === 'files-upload') {
             return <IconFiles size={20} />;
+        } else if (plugin.id === 'web-scrape') {
+            return <IconWebhook size={20} />
         }
     }
     return <IconBolt size={20} />;

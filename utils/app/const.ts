@@ -28,3 +28,7 @@ export const UPLOAD_DIR = 'uploadedFiles'
 
 export const STORE_PATH = UPLOAD_DIR + '/store';
 export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || ''
+export enum MSG_TYPE {
+  FILES = 0,
+  URL = 1
+}

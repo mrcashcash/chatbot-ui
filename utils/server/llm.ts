@@ -8,11 +8,10 @@ import path from 'path';
 import { Document } from "langchain/document";
 import { TokenTextSplitter } from "langchain/text_splitter";
 import { DocumentLoader } from 'langchain/document_loaders';
+import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio';
 import { embedDocs, searchQuery } from './vectorStore';
+import { MSG_TYPE, UPLOAD_DIR } from '../app/const';
 
-import fs from 'fs';
-import { error } from 'console';
-import { UPLOAD_DIR } from '../app/const';
 
 const embeddings = new OpenAIEmbeddings();
 const model = new OpenAI({ openAIApiKey: process.env.OPENAI_API_KEY, temperature: 0.9 });
@@ -36,28 +35,43 @@ const getFileLoader = (filepath: string, extension: string, splitter: TokenTextS
     return loader ? loader().loadAndSplit(splitter) : null;
 };
 
-export const processingData = async (filenames: string[]): Promise<Document[]> => {
+export const processingData = async (type: MSG_TYPE, values: string[]): Promise<Document[]> => {
+    // console.log('values:', values);
     const results: Document[] = [];
     const splitter = new TokenTextSplitter({
         encodingName: 'gpt2',
-        chunkSize: 4000,
-        chunkOverlap: 200,
+        chunkSize: 1000,
+        chunkOverlap: 50,
     });
+    if (type === MSG_TYPE.URL && values) {
+        const link = values[0];
+        console.log("Link: ", link)
+        const loader = new CheerioWebBaseLoader(link, { selector: 'body > div.layout__content-wrapper.layout-with-rail__content-wrapper' });
+        // const gg: CheerioAPI = await loader.scrape()
+        // const data_str = gg.html()
+        // console.log('data_str:', data_str);
+        const docs = await loader.loadAndSplit(splitter);
+        console.log('Web-Doc:', docs)
+        results.push(...docs)
+    } else if (type === MSG_TYPE.FILES && values) {
+        const filenames = values
+        for (const filename of filenames) {
+            const extension = path.extname(filename).toLowerCase();
+            const filepath = path.join(uploadDir, filename);
+            console.log('File Name:', filename);
+            console.log('------------');
 
-    for (const filename of filenames) {
-        const extension = path.extname(filename).toLowerCase();
-        const filepath = path.join(uploadDir, filename);
-        console.log('File Name:', filename);
-        console.log('------------');
-
-        const docs = await getFileLoader(filepath, extension, splitter);
-        console.log('docs:', docs);
-        if (docs) {
-            results.push(...docs);
-            console.log('Updating Docs.... Sending to Embadd...')
-        } else {
-            console.error('Invalid file type:', extension);
+            const docs = await getFileLoader(filepath, extension, splitter);
+            console.log('docs:', docs);
+            if (docs) {
+                results.push(...docs);
+                console.log('Updating Docs.... Sending to Embadd...')
+            } else {
+                console.error('Invalid file type:', extension);
+            }
         }
+    } else {
+        console.error('Invalid message type or missing filenames/Link... ');
     }
     embedDocs(results)
     return results;

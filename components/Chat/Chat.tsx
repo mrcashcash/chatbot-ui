@@ -120,7 +120,8 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         } else {
           const pluginKeysMap = {
             'google-search': ['googleAPIKey', 'googleCSEId'],
-            'files-upload': ['googleAPIKey', 'googleCSEId'],
+            'files-upload': ['filesSrverAPIKey', 'fileServerCSEId'],
+            'web-scrape': ['webAPIKey', 'webCSEId'],
           };
           body = JSON.stringify(
             getPluginChatBody(plugin.id, chatBody, pluginKeysMap[plugin.id] || []),
@@ -139,7 +140,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
-          toast.error(response.statusText);
+          toast.error(await response.text());
           return;
         }
         const data = response.body;
