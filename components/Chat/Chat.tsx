@@ -21,7 +21,7 @@ import {
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin, PluginID } from '@/types/plugin';
+import { Plugin, PluginID, pluginKeysMap } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -118,11 +118,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         if (!plugin) {
           body = JSON.stringify(chatBody);
         } else {
-          const pluginKeysMap = {
-            'google-search': ['googleAPIKey', 'googleCSEId'],
-            'files-upload': ['filesSrverAPIKey', 'fileServerCSEId'],
-            'web-scrape': ['webAPIKey', 'webCSEId'],
-          };
           body = JSON.stringify(
             getPluginChatBody(plugin.id, chatBody, pluginKeysMap[plugin.id] || []),
           );

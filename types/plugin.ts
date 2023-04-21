@@ -22,7 +22,11 @@ export enum PluginName {
   FILES_UPLOAD = 'Talk to Db',
   WEB_SCRAPE = 'Web Scrape'
 }
-
+export const pluginKeysMap = {
+  [PluginID.GOOGLE_SEARCH]: ['googleAPIKey', 'googleCSEId'],
+  [PluginID.FILES_UPLOAD]: ['filesSrverAPIKey', 'fileServerCSEId'],
+  [PluginID.WEB_SCRAPE]: ['webAPIKey', 'webCSEId'],
+};
 export const Plugins: Record<PluginID, Plugin> = {
   [PluginID.GOOGLE_SEARCH]: {
     id: PluginID.GOOGLE_SEARCH,
