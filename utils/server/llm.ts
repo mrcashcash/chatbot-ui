@@ -11,6 +11,7 @@ import { DocumentLoader } from 'langchain/document_loaders';
 import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio';
 import { embedDocs, searchQuery } from './vectorStore';
 import { MSG_TYPE, UPLOAD_DIR } from '../app/const';
+import { SelectorType } from 'cheerio';
 
 
 const embeddings = new OpenAIEmbeddings();
@@ -41,18 +42,25 @@ export const processingData = async (type: MSG_TYPE, values: string[]): Promise<
     const splitter = new TokenTextSplitter({
         encodingName: 'gpt2',
         chunkSize: 1000,
-        chunkOverlap: 50,
+        chunkOverlap: 0,
+
     });
     if (type === MSG_TYPE.URL && values) {
-        const link = values[0];
+        let link = values[0]
+        let selector
+
+        if (link.includes("{*}")) {  // check if the string contains the "{*}" separator
+            const parts = link.split("{*}");
+            link = parts[0].trim();
+            selector = parts[1].trim();
+            // console.log(link);  // output: "http://google.com"
+            // console.log(selector);  // output: "main"
+        }
         console.log("Link: ", link)
-        const loader = new CheerioWebBaseLoader(link, { selector: 'body > div.layout__content-wrapper.layout-with-rail__content-wrapper' });
-        // const gg: CheerioAPI = await loader.scrape()
-        // const data_str = gg.html()
-        // console.log('data_str:', data_str);
+        const loader = new CheerioWebBaseLoader(link, { selector: selector as SelectorType });
         const docs = await loader.loadAndSplit(splitter);
-        console.log('Web-Doc:', docs)
         results.push(...docs)
+
     } else if (type === MSG_TYPE.FILES && values) {
         const filenames = values
         for (const filename of filenames) {

@@ -13,7 +13,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         const query = userMessage.content.trim();
 
         // regular expression to match a webpath or link
-        const webpathRegex = /^(https?:\/\/|www\.)[^ "]+$/;
+        const webpathRegex = /^(https?:\/\/|www\.)[^ {]+(\{\*})?(\/[^ "]+)?(\?[^ "]+)?((#|\*)[^ "]+)?$/;
+
 
 
         // check if the input matches the webpath or link pattern
