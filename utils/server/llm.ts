@@ -7,15 +7,14 @@ import { EPubLoader } from 'langchain/document_loaders/fs/epub';
 import path from 'path';
 import { Document } from "langchain/document";
 import { TokenTextSplitter } from "langchain/text_splitter";
-import { DocumentLoader } from 'langchain/document_loaders';
+import { GithubRepoLoader } from 'langchain/document_loaders/web/github';
+import { DocumentLoader } from 'langchain/document_loaders/base';
 import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio';
 import { embedDocs, searchQuery } from './vectorStore';
 import { MSG_TYPE, UPLOAD_DIR } from '../app/const';
 import { SelectorType } from 'cheerio';
+import fs from 'fs/promises';
 
-
-const embeddings = new OpenAIEmbeddings();
-const model = new OpenAI({ openAIApiKey: process.env.OPENAI_API_KEY, temperature: 0.9 });
 const uploadDir = path.join(process.cwd(), UPLOAD_DIR);
 type FileLoaders = {
     [extension: string]: () => DocumentLoader;
@@ -37,10 +36,9 @@ const getFileLoader = (filepath: string, extension: string, splitter: TokenTextS
 };
 
 export const processingData = async (type: MSG_TYPE, values: string[]): Promise<Document[]> => {
-    // console.log('values:', values);
     const results: Document[] = [];
     const splitter = new TokenTextSplitter({
-        encodingName: 'gpt2',
+        encodingName: 'cl100k_base',
         chunkSize: 1000,
         chunkOverlap: 0,
 
@@ -53,12 +51,23 @@ export const processingData = async (type: MSG_TYPE, values: string[]): Promise<
             const parts = link.split("{*}");
             link = parts[0].trim();
             selector = parts[1].trim();
-            // console.log(link);  // output: "http://google.com"
-            // console.log(selector);  // output: "main"
         }
         console.log("Link: ", link)
         const loader = new CheerioWebBaseLoader(link, { selector: selector as SelectorType });
         const docs = await loader.loadAndSplit(splitter);
+        results.push(...docs)
+
+    } else if (type === MSG_TYPE.GITHUB_REPO && values) {
+        let git_link = values[0]
+        let branch = 'main'
+        if (git_link.includes("{*}")) {  // check if the string contains the "{*}" separator
+            const parts = git_link.split("{*}");
+            git_link = parts[0].trim();
+            branch = parts[1].trim();
+        }
+        console.log("Git_Link: ", git_link)
+        const loader = new GithubRepoLoader(git_link, { accessToken: process.env.GITHUB_TOKEN, branch: branch, unknown: "warn", recursive: true })
+        const docs = await loader.load();
         results.push(...docs)
 
     } else if (type === MSG_TYPE.FILES && values) {
@@ -81,7 +90,10 @@ export const processingData = async (type: MSG_TYPE, values: string[]): Promise<
     } else {
         console.error('Invalid message type or missing filenames/Link... ');
     }
+    console.log("results=:=: ", results.length)
     embedDocs(results)
+    const json = JSON.stringify(results);
+    await fs.writeFile('example_langchainjs.json', json);
     return results;
 };
 

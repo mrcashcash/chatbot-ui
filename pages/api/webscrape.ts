@@ -10,7 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
             req.body;
 
         const userMessage = messages[messages.length - 1];
-        const query = userMessage.content.trim();
+        const query: string = userMessage.content.trim();
 
         // regular expression to match a webpath or link
         const webpathRegex = /^(https?:\/\/|www\.)[^ {]+(\{\*})?(\/[^ "]+)?(\?[^ "]+)?((#|\*)[^ "]+)?$/;
@@ -20,7 +20,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         // check if the input matches the webpath or link pattern
         if (webpathRegex.test(query)) {
 
-            const answer = await processingData(MSG_TYPE.URL, [query]);
+            let answer;
+            if (query.startsWith("https://github.com/")) {
+                answer = await processingData(MSG_TYPE.GITHUB_REPO, [query]);
+            } else {
+                answer = await processingData(MSG_TYPE.URL, [query]);
+            }
             // Extract the filename from the link
             const cleanLink = query.replace(/(^\w+:|^)\/\/(www\.)?/, '');
             // Replace every / or \ in the link with a dot
@@ -45,7 +50,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error' })
+        res.status(500).json({ error: error })
     }
 }
 export default handler;

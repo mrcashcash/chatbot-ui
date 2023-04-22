@@ -14,5 +14,8 @@ export const getEndpoint = (plugin: Plugin | null) => {
   if (plugin.id === PluginID.WEB_SCRAPE) {
     return 'api/webscrape';
   }
+  if (plugin.id === PluginID.GITHUB_REPO) {
+    return 'api/webscrape';
+  }
   return 'api/chat';
 };

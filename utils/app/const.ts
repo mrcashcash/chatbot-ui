@@ -30,5 +30,6 @@ export const STORE_PATH = UPLOAD_DIR + '/store';
 export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || ''
 export enum MSG_TYPE {
   FILES = 0,
-  URL = 1
+  URL = 1,
+  GITHUB_REPO = 2
 }
