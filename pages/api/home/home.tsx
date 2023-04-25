@@ -37,8 +37,9 @@ import Promptbar from '@/components/Promptbar';
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 import { v4 as uuidv4 } from 'uuid';
-import { UploadFile } from '@/types/uploadfile';
-import { saveFiles } from '@/utils/app/files';
+// import { UploadFile } from '@/types/uploadfile';
+
+import { fetchVectorStoreList } from '@/utils/app/api';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -68,6 +69,7 @@ const Home = ({
       conversations,
       selectedConversation,
       prompts,
+      selectedVectorStores,
       uploadedFiles,
       temperature,
     },
@@ -227,16 +229,13 @@ const Home = ({
 
 
   //  FilesList saved ------------
-  const handleUpdateUploadedFiles = (filesList: UploadFile[]) => {
-    dispatch({ field: 'uploadedFiles', value: filesList });
-    saveFiles(filesList);
-  };
-
-
-  const handleDeleteFile = (fileId: string) => {
-    const updatedFiles = uploadedFiles.filter((file) => file.id !== fileId);
-    // dispatch({ field: 'uploadedFiles', value: updatedFiles });
-    // saveFiles(updatedFiles)
+  const handleToggleVectorStoreSelection = (name: string) => {
+    const isSelected = selectedVectorStores.includes(name);
+    if (isSelected) {
+      dispatch({ field: 'selectedVectorStores', value: selectedVectorStores.filter((i) => i !== name) });
+    } else {
+      dispatch({ field: 'selectedVectorStores', value: [...selectedVectorStores, name] });
+    }
   };
 
   // EFFECTS  --------------------------------------------
@@ -364,6 +363,21 @@ const Home = ({
     serverSidePluginKeysSet,
   ]);
 
+  // VectorStore
+  const refreshVectorStoresList = async () => {
+    // Fetch the updated VectorStoresList from the server
+    const updatedVectorStoresList = await fetchVectorStoreList(); // Replace with the appropriate API call
+    if (updatedVectorStoresList) {
+      dispatch({
+        field: 'VectorStoresList',
+        value: updatedVectorStoresList,
+      });
+    }
+  };
+  useEffect(() => {
+    // Fetch the initial VectorStoresList from the server
+    refreshVectorStoresList();
+  }, []);
   return (
     <HomeContext.Provider
       value={{
@@ -374,8 +388,8 @@ const Home = ({
         handleUpdateFolder,
         handleSelectConversation,
         handleUpdateConversation,
-        handleUpdateUploadedFiles,
-        handleDeleteFile,
+        refreshVectorStoresList,
+        handleToggleVectorStoreSelection
       }}
     >
       <Head>

@@ -53,7 +53,7 @@ export const ChatInput = ({
     state: { selectedConversation, messageIsStreaming, prompts },
 
     dispatch: homeDispatch,
-    handleUpdateUploadedFiles
+
   } = useContext(HomeContext);
 
   const [content, setContent] = useState<string>();
@@ -102,7 +102,7 @@ export const ChatInput = ({
 
     onSend({ role: 'user', content }, plugin);
     setContent('');
-    setPlugin(null);
+    // setPlugin(null);
 
     if (window.innerWidth < 640 && textareaRef && textareaRef.current) {
       textareaRef.current.blur();

@@ -3,24 +3,12 @@ import { useTranslation } from 'react-i18next';
 import HomeContext from '@/pages/api/home/home.context';
 import { FilesList } from './FilesList';
 import { UploadFile } from '@/types/uploadfile';
-import { IconFileUpload, IconUpload, IconFolderPlus } from '@tabler/icons-react';
+import { IconFileUpload, IconUpload, IconFolderPlus, IconBrandGithub, IconBrandGoogle, IconExternalLink } from '@tabler/icons-react';
 import Spinner from '../Spinner';
-
-const fetchFilesList = async () => {
-    try {
-        const response = await fetch('/api/getFilesList');
-        if (response.ok) {
-            const filesList = await response.json();
-            return filesList;
-        } else {
-            console.error('Failed to fetch files list.');
-            return [];
-        }
-    } catch (error) {
-        console.error('Error fetching files list:', error);
-        return [];
-    }
-};
+import { VectorStoreInfo } from '@/utils/server/vectorStore';
+import { toast } from 'react-hot-toast';
+import CustomInputModal from './CustomInputModal'; // Import the new modal component
+import { MSG_TYPE } from '@/utils/app/const';
 
 
 const UploadedFile = () => {
@@ -28,16 +16,23 @@ const UploadedFile = () => {
     const folderInputRef = useRef<HTMLInputElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [loading, setLoading] = useState(false);
-
+    const [showModal, setShowModal] = useState(false);
+    const [inputType, setInputType] = useState(MSG_TYPE.FILES);
+    const [inputLabel1, setInputLabel1] = useState('');
+    const [inputLabel2, setInputLabel2] = useState('');
     const {
-        state: { uploadedFiles },
-        dispatch: homeDispatch,
-        handleUpdateUploadedFiles
+        state: { VectorStoresList },
+        dispatch: homeDispatch, refreshVectorStoresList
     } = useContext(HomeContext);
-
+    const openModalWithLabels = (inputType: MSG_TYPE, label1: string, label2: string) => {
+        setInputType(inputType)
+        setInputLabel1(label1);
+        setInputLabel2(label2);
+        setShowModal(true);
+    };
     const handleFileUploadChange = async (event: ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
-
+        setLoading(true);
         if (files) {
 
             const formData = new FormData();
@@ -56,76 +51,115 @@ const UploadedFile = () => {
                 return acc;
             }, []);
             try {
+
                 const response = await fetch('/api/uploadFiles', {
                     method: 'POST',
                     body: formData,
                 });
 
                 if (response.ok) {
-                    const { _, allfiles } = await response.json()
-                    handleUpdateUploadedFiles(allfiles as UploadFile[]);
+                    toast.success("Upload Done!", { duration: 500 })
+                    refreshVectorStoresList()
                 } else {
                     console.error('Failed to upload files.');
                 }
+                setLoading(false)
             } catch (error) {
+                setLoading(false)
                 console.error('Error uploading files:', error);
             }
         }
     };
-    useEffect(() => {
-        const loadFilesList = async () => {
-            setLoading(true);
-            try {
-                const fileslist = await fetchFilesList();
-                handleUpdateUploadedFiles(fileslist);
+    const handleModalSubmit = (inputValue1: string, inputValue2: string, inputValue3: string) => {
+        const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+        const stringNoSymbolsOrSpaces = /^[a-zA-Z0-9]+$/;
 
-                // const filesList = await fetchFilesList();
-                // handleUpdateUploadedFiles(filesList);
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+        if (!inputValue1 || !urlRegex.test(inputValue1)) {
+            alert('Input 1 is required and must be a valid website link.');
+            return;
+        }
 
-        loadFilesList();
-    }, []);
+        if (inputValue2 && typeof inputValue2 !== 'string') {
+            alert('Input 2 must be a string.');
+            return;
+        }
+
+        if (!inputValue3 || !stringNoSymbolsOrSpaces.test(inputValue3)) {
+            alert('Input 3 is required and must contain only characters and numbers (no symbols or spaces).');
+            return;
+        }
+
+        // Handle the submitted form values here
+        console.log('Input Value 1:', inputValue1);
+        console.log('Input Value 2:', inputValue2);
+        console.log('Input Value 3:', inputValue3);
+    };
+
     return (
-        <div className="flex w-full flex-col gap-1">
-            <ul className="z-10 max-h-max w-full overflow-scroll rounded bg-white shadow-[0_0_10px_rgba(0,0,0,0.10)] dark:border-neutral-500 dark:bg-[#343541] dark:text-white dark:shadow-[0_0_15px_rgba(0,0,0,0.10)]">
-                <div className="flex justify-between items-center px-3 py-1">
-                    <li className="text-lg font-semibold text-black dark:text-white">
-                        Files
-                    </li>
-                    <div className="flex">
-                        <button
-                            type="button"
-                            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
-                            onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                        >
-                            <IconFileUpload size={24} />
-                        </button>
-                        <button
-                            type="button"
-                            className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
-                            onClick={() => folderInputRef.current && folderInputRef.current.click()}
-                        >
-                            <IconFolderPlus size={24} />
-                        </button>
+        <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
+
+            <div className="flex items-center">
+                <div className='mr-2 font-semibold'>Upload:</div>
+                <button
+                    type="button"
+                    className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                >
+                    <IconFileUpload size={18} />
+                </button>
+                <button
+                    type="button"
+                    className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    onClick={() => folderInputRef.current && folderInputRef.current.click()}
+                >
+                    <IconFolderPlus size={18} />
+                </button>
+                <button
+                    type="button"
+                    className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    onClick={() => openModalWithLabels(MSG_TYPE.GITHUB_REPO, 'Github Repo Link', 'Github Branch')}
+                >
+                    <IconBrandGithub size={18} />
+                </button>
+                <button
+                    type="button"
+                    className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    onClick={() => openModalWithLabels(MSG_TYPE.GOOGLE_SEARCH, 'Google Search', 'Google Input 2')}
+                >
+                    <IconBrandGoogle size={18} />
+                </button>
+                <button
+                    type="button"
+                    className="p-2 rounded hover:bg-gray-200 dark:hover:bg-neutral-700"
+                    onClick={() => openModalWithLabels(MSG_TYPE.URL, 'WebSite Link', 'Selector // example:"body"')}
+                >
+                    <IconExternalLink size={18} />
+                </button>
+            </div>
+            <div className="text-lg font-semibold mb-2">Db Indexes</div>
+            {loading ? (
+                <Spinner />
+            ) : (
+                VectorStoresList && VectorStoresList.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-1 auto-cols-fr">
+                        {VectorStoresList.map((vs, index) => (
+                            <FilesList key={index} vs={vs} index={index} />
+                        ))}
                     </div>
-                </div>
-                {loading ? (
-                    <Spinner />
                 ) : (
-                    uploadedFiles && uploadedFiles.length > 0 ? (
-                        uploadedFiles.map((file, index) => (
-                            <FilesList key={index} file={file} index={index} />
-                        ))
-                    ) : (
-                        <div>No files.</div>
-                    )
-                )}
-            </ul>
+                    <div>No files.</div>
+                )
+            )}
+            {showModal && (
+                <CustomInputModal
+                    inputType={inputType}
+                    showModal={showModal}
+                    closeModal={() => setShowModal(false)}
+                    inputLabel1={inputLabel1}
+                    inputLabel2={inputLabel2}
+                    handleFormValues={handleModalSubmit} // Make sure this line is present
+                />
+            )}
             <input
                 type="file"
                 multiple
@@ -138,7 +172,6 @@ const UploadedFile = () => {
                 multiple
                 style={{ display: 'none' }}
                 ref={folderInputRef}
-                disabled={true}
                 onChange={handleFileUploadChange}
                 {...({ webkitdirectory: '' } as any)}
             />

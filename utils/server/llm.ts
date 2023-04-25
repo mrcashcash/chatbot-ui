@@ -10,7 +10,7 @@ import { TokenTextSplitter } from "langchain/text_splitter";
 import { GithubRepoLoader } from 'langchain/document_loaders/web/github';
 import { DocumentLoader } from 'langchain/document_loaders/base';
 import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio';
-import { embedDocs, searchQuery } from './vectorStore';
+import { embedDocs } from './vectorStore';
 import { MSG_TYPE, UPLOAD_DIR } from '../app/const';
 import { SelectorType } from 'cheerio';
 import fs from 'fs/promises';
@@ -91,13 +91,13 @@ export const processingData = async (type: MSG_TYPE, values: string[]): Promise<
         console.error('Invalid message type or missing filenames/Link... ');
     }
     console.log("results=:=: ", results.length)
-    embedDocs(results)
+    embedDocs(results, "testdb")
     const json = JSON.stringify(results);
     await fs.writeFile('example_langchainjs.json', json);
     return results;
 };
 
-export const processQuery = async (query: string) => {
-    return searchQuery(query)
-}
+// export const processQuery = async (query: string) => {
+//     return searchQuery(query)
+// }
 

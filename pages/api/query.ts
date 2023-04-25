@@ -1,71 +1,32 @@
-import { processQuery } from "@/utils/server/llm";
+import { OpenAIChat } from "langchain/llms/openai";
 import endent from "endent";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Document } from "langchain/document";
 import { ChatBody, Message } from '@/types/chat';
-import { OPENAI_API_HOST } from "@/utils/app/const";
+import { ConversationalRetrievalQAChain, LLMChain, ChatVectorDBQAChain } from "langchain/chains";
+import { DEFAULT_SYSTEM_PROMPT, DEFAULT_TEMPERATURE, OPENAI_API_HOST, OPENAI_API_KEY } from "@/utils/app/const";
+import { VectorStore, processQuery } from "@/utils/server/vectorStore";
+import { PromptTemplate } from "langchain/prompts";
 
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
     try {
-        const { messages, key, model } =
+        const { messages, key, model, prompt, temperature } =
             req.body as ChatBody;
-
+        let answer;
         const userMessage = messages[messages.length - 1];
-        const query = encodeURIComponent(userMessage.content.trim());
-        const docs: Document[] = await processQuery(query)
-        const answerPrompt = endent`
-    Provide me with the information I requested. Use the sources to provide an accurate response. Respond in markdown format. Cite the sources you used as a markdown link as you use them at the end of each sentence by number of the source (ex: [[1]](link.com or /exapmle/file.txt)). Provide an accurate response and then stop. Today's date is ${new Date().toLocaleDateString()}.
+        const messagesArray = messages.map(message => `${message.role}:${message.content}`);
 
-    Example Input:
-    What's the weather in San Francisco today?
-
-    Example Sources:
-    (google.com/search/cooler.html) : DATA CONTENT
-
-    Example Response:
-    It's 70 degrees and sunny in San Francisco today. [[1]](google.com/search/cooler.html)
-
-    Input:
-    ${userMessage.content.trim()}
-
-    Sources:
-    ${docs.map((doc) => {
-            return endent`
-      (${doc.metadata.source}): ${doc.pageContent}
-      `;
-        })}
-
-    Response:
-    `;
-        const answerMessage: Message = { role: 'user', content: answerPrompt };
-        const answerRes = await fetch(`${OPENAI_API_HOST}/v1/chat/completions`, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${key ? key : process.env.OPENAI_API_KEY}`,
-                ...(process.env.OPENAI_ORGANIZATION && {
-                    'OpenAI-Organization': process.env.OPENAI_ORGANIZATION,
-                }),
-            },
-            method: 'POST',
-            body: JSON.stringify({
-                model: model.id,
-                messages: [
-                    {
-                        role: 'system',
-                        content: `Use the sources to provide an accurate response. Respond in markdown format. Cite the sources you used as [1](link), etc, as you use them. Maximum 4 sentences.`,
-                    },
-                    answerMessage,
-                ],
-                max_tokens: 1000,
-                temperature: 1,
-                stream: false,
-            }),
+        const chat_history = messages.pop()
+        const query = userMessage.content.trim();
+        const llm = new OpenAIChat({ modelName: model.id, openAIApiKey: OPENAI_API_KEY, temperature: temperature });
+        const vs = await VectorStore.getInstance("langchain-js");
+        const chain = ConversationalRetrievalQAChain.fromLLM(llm, vs.asRetriever(3));
+        const followUpRes = await chain.call({
+            question: query,
+            chat_history: messagesArray,
         });
-        const { choices: choices2 } = await answerRes.json();
-        const answer = choices2[0].message.content;
-
-        res.status(200).json({ answer });
+        res.status(200).json({ answer: followUpRes.text });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: error })
