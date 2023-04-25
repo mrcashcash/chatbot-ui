@@ -37,9 +37,9 @@ import Promptbar from '@/components/Promptbar';
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 import { v4 as uuidv4 } from 'uuid';
-// import { UploadFile } from '@/types/uploadfile';
-
 import { fetchVectorStoreList } from '@/utils/app/api';
+import { VectorStoreInfo } from '@/utils/server/vectorStore';
+import { saveSelectedVectorStores } from '@/utils/app/files';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -70,7 +70,6 @@ const Home = ({
       selectedConversation,
       prompts,
       selectedVectorStores,
-      uploadedFiles,
       temperature,
     },
     dispatch,
@@ -231,12 +230,18 @@ const Home = ({
   //  FilesList saved ------------
   const handleToggleVectorStoreSelection = (name: string) => {
     const isSelected = selectedVectorStores.includes(name);
+    let newSelectedVectorStores;
+
     if (isSelected) {
-      dispatch({ field: 'selectedVectorStores', value: selectedVectorStores.filter((i) => i !== name) });
+      newSelectedVectorStores = selectedVectorStores.filter((i) => i !== name);
     } else {
-      dispatch({ field: 'selectedVectorStores', value: [...selectedVectorStores, name] });
+      newSelectedVectorStores = [...selectedVectorStores, name];
     }
+
+    dispatch({ field: 'selectedVectorStores', value: newSelectedVectorStores });
+    saveSelectedVectorStores(newSelectedVectorStores);
   };
+
 
   // EFFECTS  --------------------------------------------
 
@@ -314,9 +319,9 @@ const Home = ({
     if (prompts) {
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
     }
-    const files = localStorage.getItem('files');
-    if (files) {
-      dispatch({ field: 'uploadedFiles', value: JSON.parse(files) });
+    const selectedVectorStores = localStorage.getItem('selectedVectorStores');
+    if (selectedVectorStores) {
+      dispatch({ field: 'selectedVectorStores', value: JSON.parse(selectedVectorStores) });
     }
     const conversationHistory = localStorage.getItem('conversationHistory');
     if (conversationHistory) {

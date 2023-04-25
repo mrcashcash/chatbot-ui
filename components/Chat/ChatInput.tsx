@@ -27,8 +27,6 @@ import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 import PluginIconWrapper from './PluginIcon';
-import { UploadFile } from '@/types/uploadfile';
-import UploadedFile from '../UploadedFiles/Uploadedfiles';
 
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;

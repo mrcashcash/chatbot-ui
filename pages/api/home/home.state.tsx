@@ -4,7 +4,6 @@ import { FolderInterface } from '@/types/folder';
 import { OpenAIModel, OpenAIModelID } from '@/types/openai';
 import { PluginKey } from '@/types/plugin';
 import { Prompt } from '@/types/prompt';
-import { UploadFile } from '@/types/uploadfile';
 import { VectorStoreInfo } from '@/utils/server/vectorStore';
 
 export interface HomeInitialState {
@@ -20,7 +19,6 @@ export interface HomeInitialState {
   selectedConversation: Conversation | undefined;
   currentMessage: Message | undefined;
   prompts: Prompt[];
-  uploadedFiles: UploadFile[];
   temperature: number;
   showChatbar: boolean;
   showPromptbar: boolean;
@@ -47,7 +45,6 @@ export const initialState: HomeInitialState = {
   selectedConversation: undefined,
   currentMessage: undefined,
   prompts: [],
-  uploadedFiles: [],
   temperature: 1,
   showPromptbar: true,
   showChatbar: true,

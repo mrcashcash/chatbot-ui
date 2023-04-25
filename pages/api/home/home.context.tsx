@@ -7,7 +7,6 @@ import { KeyValuePair } from '@/types/data';
 import { FolderType } from '@/types/folder';
 
 import { HomeInitialState } from './home.state';
-import { UploadFile } from '@/types/uploadfile';
 import { VectorStoreInfo } from '@/utils/server/vectorStore';
 
 export interface HomeContextProps {
@@ -24,7 +23,7 @@ export interface HomeContextProps {
   ) => void;
   // handleUpdateVectorStoreList: (VectorStoreList: VectorStoreInfo[]) => void;
   refreshVectorStoresList: () => void;
-  handleToggleVectorStoreSelection: (name: string) => void;
+  handleToggleVectorStoreSelection: (vs: string) => void;
 
 }
 

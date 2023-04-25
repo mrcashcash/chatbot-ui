@@ -173,7 +173,7 @@ const UploadedFile = () => {
                 VectorStoresList && VectorStoresList.length > 0 ? (
                     <div className="w-full grid grid-cols-2 gap-1 auto-cols-fr">
                         {VectorStoresList.map((vs, index) => (
-                            <FilesList key={index} vs={vs} index={index} />
+                            <FilesList key={index} name={vs.name} index={index} />
                         ))}
                     </div>
                 ) : (
