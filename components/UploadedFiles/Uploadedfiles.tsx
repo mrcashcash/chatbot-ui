@@ -70,7 +70,8 @@ const UploadedFile = () => {
             }
         }
     };
-    const handleModalSubmit = (inputValue1: string, inputValue2: string, inputValue3: string) => {
+    const handleModalSubmit = async (inputType: MSG_TYPE, inputValue1: string, inputValue2: string, inputValue3: string) => {
+        setLoading(true)
         const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
         const stringNoSymbolsOrSpaces = /^[a-zA-Z0-9]+$/;
 
@@ -93,6 +94,35 @@ const UploadedFile = () => {
         console.log('Input Value 1:', inputValue1);
         console.log('Input Value 2:', inputValue2);
         console.log('Input Value 3:', inputValue3);
+        try {
+            const body = {
+                inputType,
+                inputValue1,
+                inputValue2,
+                inputValue3
+            }
+
+            const response = await fetch('/api/webscrape', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            });
+
+            if (response.ok) {
+                toast.success("Upload Done!", { duration: 500 })
+                refreshVectorStoresList()
+            } else {
+                console.error('Failed to upload files.');
+            }
+            setLoading(false)
+        } catch (error) {
+            setLoading(false)
+            console.error('Error uploading files:', error);
+        }
+
+
     };
 
     return (
@@ -141,7 +171,7 @@ const UploadedFile = () => {
                 <Spinner />
             ) : (
                 VectorStoresList && VectorStoresList.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-1 auto-cols-fr">
+                    <div className="w-full grid grid-cols-2 gap-1 auto-cols-fr">
                         {VectorStoresList.map((vs, index) => (
                             <FilesList key={index} vs={vs} index={index} />
                         ))}

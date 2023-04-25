@@ -7,7 +7,7 @@ interface CustomInputModalProps {
     closeModal: () => void;
     inputLabel1: string;
     inputLabel2: string;
-    handleFormValues: (inputValue1: string, inputValue2: string, inputValue3: string) => void;
+    handleFormValues: (inputType: MSG_TYPE, inputValue1: string, inputValue2: string, inputValue3: string) => void;
 
 }
 
@@ -27,29 +27,31 @@ const CustomInputModal: React.FC<CustomInputModalProps> = ({ inputType, showModa
 
         let isValid = true;
 
-        if (!inputValue1 || !urlRegex.test(inputValue1)) {
-            setInputError1('Input 1 is required and must be a valid website link.');
+        if (!inputValue1) {
+            setInputError1(inputLabel1 + ' is required.');
+            isValid = false;
+        } else if (inputType !== MSG_TYPE.GOOGLE_SEARCH && !urlRegex.test(inputValue1)) {
+            setInputError1(inputLabel1 + ' must be a valid website link.');
             isValid = false;
         } else {
             setInputError1('');
         }
-
         if (inputValue2 && typeof inputValue2 !== 'string') {
-            setInputError2('Input 2 must be a string.');
+            setInputError2(inputLabel2 + ' must be a string.');
             isValid = false;
         } else {
             setInputError2('');
         }
 
         if (!inputValue3 || !stringNoSymbolsOrSpaces.test(inputValue3)) {
-            setInputError3('Input 3 is required and must contain only characters and numbers (no symbols or spaces).');
+            setInputError3('VectorStore Name is required and must contain only characters and numbers (no symbols or spaces).');
             isValid = false;
         } else {
             setInputError3('');
         }
 
         if (isValid) {
-            handleFormValues(inputValue1, inputValue2, inputValue3);
+            handleFormValues(inputType, inputValue1, inputValue2, inputValue3);
             closeModal();
         }
     };
@@ -73,7 +75,7 @@ const CustomInputModal: React.FC<CustomInputModalProps> = ({ inputType, showModa
                         />
                         {inputError1 && <p className="mt-1 text-xs text-red-600">{inputError1}</p>}
                     </div>
-                    <div className="mb-3">
+                    {inputType != MSG_TYPE.GOOGLE_SEARCH && <div className="mb-3">
                         <label className="block text-sm font-semibold mb-1">{inputLabel2}:</label>
                         <input
                             type="text"
@@ -82,7 +84,8 @@ const CustomInputModal: React.FC<CustomInputModalProps> = ({ inputType, showModa
                             className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-600 rounded text-neutral-100 dark:text-gray-900"
                         />
                         {inputError2 && <p className="mt-1 text-xs text-red-600">{inputError2}</p>}
-                    </div>
+                    </div>}
+
                     <div className="mb-3">
                         <label className="block text-sm font-semibold mb-1">VectorStore Name:</label>
                         <input

@@ -43,15 +43,11 @@ export const processingData = async (type: MSG_TYPE, values: string[]): Promise<
         chunkOverlap: 0,
 
     });
+    let vs_name = values[2]
     if (type === MSG_TYPE.URL && values) {
         let link = values[0]
-        let selector
-
-        if (link.includes("{*}")) {  // check if the string contains the "{*}" separator
-            const parts = link.split("{*}");
-            link = parts[0].trim();
-            selector = parts[1].trim();
-        }
+        let selector = values[1]
+        selector = selector != '' ? selector : 'body'
         console.log("Link: ", link)
         const loader = new CheerioWebBaseLoader(link, { selector: selector as SelectorType });
         const docs = await loader.loadAndSplit(splitter);
@@ -59,12 +55,8 @@ export const processingData = async (type: MSG_TYPE, values: string[]): Promise<
 
     } else if (type === MSG_TYPE.GITHUB_REPO && values) {
         let git_link = values[0]
-        let branch = 'main'
-        if (git_link.includes("{*}")) {  // check if the string contains the "{*}" separator
-            const parts = git_link.split("{*}");
-            git_link = parts[0].trim();
-            branch = parts[1].trim();
-        }
+        let branch = values[1]
+        branch = branch != "" ? branch : 'main'
         console.log("Git_Link: ", git_link)
         const loader = new GithubRepoLoader(git_link, { accessToken: process.env.GITHUB_TOKEN, branch: branch, unknown: "warn", recursive: true })
         const docs = await loader.load();
@@ -72,9 +64,11 @@ export const processingData = async (type: MSG_TYPE, values: string[]): Promise<
 
     } else if (type === MSG_TYPE.FILES && values) {
         const filenames = values
+        vs_name = filenames[0].split('.').slice(0, -1).join('.') + '...';
         for (const filename of filenames) {
             const extension = path.extname(filename).toLowerCase();
             const filepath = path.join(uploadDir, filename);
+
             console.log('File Name:', filename);
             console.log('------------');
 
@@ -91,9 +85,9 @@ export const processingData = async (type: MSG_TYPE, values: string[]): Promise<
         console.error('Invalid message type or missing filenames/Link... ');
     }
     console.log("results=:=: ", results.length)
-    embedDocs(results, "testdb")
-    const json = JSON.stringify(results);
-    await fs.writeFile('example_langchainjs.json', json);
+    embedDocs(results, vs_name)
+    // const json = JSON.stringify(results);
+    // await fs.writeFile('example_langchainjs.json', json);
     return results;
 };
 
