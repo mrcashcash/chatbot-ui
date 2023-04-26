@@ -21,7 +21,7 @@ import {
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin, PluginID, pluginKeysMap } from '@/types/plugin';
+import { Plugin, PluginID, PluginName, pluginKeysMap } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -153,7 +153,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
-        if (!plugin) {
+        if (!plugin || plugin.name === PluginName.FILES_UPLOAD) {
           if (updatedConversation.messages.length === 1) {
             const { content } = message;
             const customName =
