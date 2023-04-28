@@ -9,6 +9,7 @@ import { VectorStoreInfo } from '@/utils/server/vectorStore';
 import { toast } from 'react-hot-toast';
 import CustomInputModal from './CustomInputModal'; // Import the new modal component
 import { MSG_TYPE } from '@/utils/app/const';
+import { AudioRecorder } from '../Recorder/Recorder';
 
 
 const UploadedFile = () => {

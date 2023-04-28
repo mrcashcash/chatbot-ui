@@ -27,6 +27,7 @@ import { PluginSelect } from './PluginSelect';
 import { PromptList } from './PromptList';
 import { VariableModal } from './VariableModal';
 import PluginIconWrapper from './PluginIcon';
+import { AudioRecorder } from '../Recorder/Recorder';
 
 interface Props {
   onSend: (message: Message, plugin: Plugin | null) => void;
@@ -53,11 +54,16 @@ export const ChatInput = ({
     dispatch: homeDispatch,
 
   } = useContext(HomeContext);
+  const prevTranscriptRef = useRef<string>('');
+  const originalContentRef = useRef<string>('');
+  const [resetTranscriptSignal, setResetTranscriptSignal] = useState(false);
 
+
+  const [isRecording, setIsRecording] = useState(false);
   const [content, setContent] = useState<string>();
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [showPromptList, setShowPromptList] = useState(false);
-  const [activeFileIndex, setActiveFileIndex] = useState<number | null>(null);
+  // const [activeFileIndex, setActiveFileIndex] = useState<number | null>(null);
   const [activePromptIndex, setActivePromptIndex] = useState(0);
   const [promptInputValue, setPromptInputValue] = useState('');
   const [variables, setVariables] = useState<string[]>([]);
@@ -224,10 +230,19 @@ export const ChatInput = ({
     }
   };
 
-  const handleFileSelect = (index: number) => {
-    setActiveFileIndex(index);
-  };
+  // const handleFileSelect = (index: number) => {
+  //   setActiveFileIndex(index);
+  // };
 
+  const handleTranscript = (transcript: string) => {
+    if (isRecording && originalContentRef.current === '') {
+      originalContentRef.current = content as string;
+    }
+    if (prevTranscriptRef.current !== transcript) {
+      setContent(originalContentRef.current + ' ' + transcript.trim());
+      prevTranscriptRef.current = transcript;
+    }
+  }
 
   useEffect(() => {
     if (promptListRef.current) {
@@ -236,13 +251,31 @@ export const ChatInput = ({
   }, [activePromptIndex]);
 
   useEffect(() => {
+    if (isRecording) {
+      setResetTranscriptSignal(true);
+      setTimeout(() => {
+        setResetTranscriptSignal(false);
+      }, 100);
+    }
+    console.log("Parent:uEff:[content, isRecording]")
+
+    if (!isRecording) {
+      originalContentRef.current = content as string;
+      console.log("Parent:uEff:[content, isRecording]-!isRecording-content:", content)
+
+    } else {
+      setResetTranscriptSignal(true);
+      setTimeout(() => {
+        setResetTranscriptSignal(false);
+      }, 100);
+    }
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
       textareaRef.current.style.overflow = `${textareaRef?.current?.scrollHeight > 400 ? 'auto' : 'hidden'
         }`;
     }
-  }, [content]);
+  }, [content, isRecording]);
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -260,6 +293,8 @@ export const ChatInput = ({
       window.removeEventListener('click', handleOutsideClick);
     };
   }, []);
+
+
 
   return (
     <div className="absolute bottom-0 left-0 w-full border-transparent bg-gradient-to-b from-transparent via-white to-white pt-6 dark:border-white/20 dark:via-[#343541] dark:to-[#343541] md:pt-2">
@@ -339,6 +374,17 @@ export const ChatInput = ({
             onKeyDown={handleKeyDown}
           />
 
+          {!messageIsStreaming &&
+            <AudioRecorder
+              onUpdateTranscript={handleTranscript}
+              onStartRecording={() => setIsRecording(true)}
+              onStopRecording={() => {
+                originalContentRef.current = '';
+                prevTranscriptRef.current = '';
+                setIsRecording(false)
+              }}
+              resetSignal={resetTranscriptSignal}
+            />}
           <button
             className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"
             onClick={handleSend}
@@ -349,7 +395,6 @@ export const ChatInput = ({
               <IconSend size={18} />
             )}
           </button>
-
           {showScrollDownButton && (
             <div className="absolute bottom-12 right-0 lg:bottom-0 lg:-right-10">
               <button

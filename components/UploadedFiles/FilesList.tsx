@@ -1,6 +1,6 @@
 import { FC, useState, useContext, useEffect } from 'react';
 import HomeContext from '@/pages/api/home/home.context';
-import { VectorStoreInfo } from '@/utils/server/vectorStore';
+
 
 interface Props {
     name: string;
