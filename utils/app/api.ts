@@ -1,4 +1,5 @@
 import { Plugin, PluginID } from '@/types/plugin';
+import { VectorStoreInfo } from '../server/vectorStore';
 
 export const getEndpoint = (plugin: Plugin | null) => {
   if (!plugin) {
@@ -14,5 +15,24 @@ export const getEndpoint = (plugin: Plugin | null) => {
   if (plugin.id === PluginID.WEB_SCRAPE) {
     return 'api/webscrape';
   }
+  if (plugin.id === PluginID.GITHUB_REPO) {
+    return 'api/webscrape';
+  }
   return 'api/chat';
+};
+
+export const fetchVectorStoreList = async () => {
+  try {
+    const response = await fetch('/api/getVectorStoresList');
+    if (response.ok) {
+      const vectorStoreList = await response.json() as VectorStoreInfo[];
+      return vectorStoreList;
+    } else {
+      console.error('Failed to fetch files list.');
+      return [];
+    }
+  } catch (error) {
+    console.error('Error fetching files list:', error);
+    return [];
+  }
 };

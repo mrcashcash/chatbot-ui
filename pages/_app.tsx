@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime'
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from 'react-query';
 

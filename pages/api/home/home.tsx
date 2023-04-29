@@ -37,8 +37,9 @@ import Promptbar from '@/components/Promptbar';
 import HomeContext from './home.context';
 import { HomeInitialState, initialState } from './home.state';
 import { v4 as uuidv4 } from 'uuid';
-import { UploadFile } from '@/types/uploadfile';
-import { saveFiles } from '@/utils/app/files';
+import { fetchVectorStoreList } from '@/utils/app/api';
+import { VectorStoreInfo } from '@/utils/server/vectorStore';
+import { saveSelectedVectorStores } from '@/utils/app/files';
 
 interface Props {
   serverSideApiKeyIsSet: boolean;
@@ -68,7 +69,7 @@ const Home = ({
       conversations,
       selectedConversation,
       prompts,
-      uploadedFiles,
+      selectedVectorStores,
       temperature,
     },
     dispatch,
@@ -227,17 +228,20 @@ const Home = ({
 
 
   //  FilesList saved ------------
-  const handleUpdateUploadedFiles = (filesList: UploadFile[]) => {
-    dispatch({ field: 'uploadedFiles', value: filesList });
-    saveFiles(filesList);
+  const handleToggleVectorStoreSelection = (name: string) => {
+    const isSelected = selectedVectorStores.includes(name);
+    let newSelectedVectorStores;
+
+    if (isSelected) {
+      newSelectedVectorStores = selectedVectorStores.filter((i) => i !== name);
+    } else {
+      newSelectedVectorStores = [...selectedVectorStores, name];
+    }
+
+    dispatch({ field: 'selectedVectorStores', value: newSelectedVectorStores });
+    saveSelectedVectorStores(newSelectedVectorStores);
   };
 
-
-  const handleDeleteFile = (fileId: string) => {
-    const updatedFiles = uploadedFiles.filter((file) => file.id !== fileId);
-    // dispatch({ field: 'uploadedFiles', value: updatedFiles });
-    // saveFiles(updatedFiles)
-  };
 
   // EFFECTS  --------------------------------------------
 
@@ -315,9 +319,9 @@ const Home = ({
     if (prompts) {
       dispatch({ field: 'prompts', value: JSON.parse(prompts) });
     }
-    const files = localStorage.getItem('files');
-    if (files) {
-      dispatch({ field: 'uploadedFiles', value: JSON.parse(files) });
+    const selectedVectorStores = localStorage.getItem('selectedVectorStores');
+    if (selectedVectorStores) {
+      dispatch({ field: 'selectedVectorStores', value: JSON.parse(selectedVectorStores) });
     }
     const conversationHistory = localStorage.getItem('conversationHistory');
     if (conversationHistory) {
@@ -364,6 +368,21 @@ const Home = ({
     serverSidePluginKeysSet,
   ]);
 
+  // VectorStore
+  const refreshVectorStoresList = async () => {
+    // Fetch the updated VectorStoresList from the server
+    const updatedVectorStoresList = await fetchVectorStoreList(); // Replace with the appropriate API call
+    if (updatedVectorStoresList) {
+      dispatch({
+        field: 'VectorStoresList',
+        value: updatedVectorStoresList,
+      });
+    }
+  };
+  useEffect(() => {
+    // Fetch the initial VectorStoresList from the server
+    refreshVectorStoresList();
+  }, []);
   return (
     <HomeContext.Provider
       value={{
@@ -374,8 +393,8 @@ const Home = ({
         handleUpdateFolder,
         handleSelectConversation,
         handleUpdateConversation,
-        handleUpdateUploadedFiles,
-        handleDeleteFile,
+        refreshVectorStoresList,
+        handleToggleVectorStoreSelection
       }}
     >
       <Head>

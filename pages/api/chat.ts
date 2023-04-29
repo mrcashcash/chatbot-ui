@@ -43,6 +43,7 @@ const handler = async (req: Request): Promise<Response> => {
       const tokens = encoding.encode(message.content);
 
       if (tokenCount + tokens.length + 1000 > model.tokenLimit) {
+        console.log("Break Token limit: ", tokenCount)
         break;
       }
       tokenCount += tokens.length;

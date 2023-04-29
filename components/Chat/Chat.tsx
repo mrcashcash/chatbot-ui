@@ -21,7 +21,7 @@ import {
 import { throttle } from '@/utils/data/throttle';
 
 import { ChatBody, Conversation, Message } from '@/types/chat';
-import { Plugin, PluginID, pluginKeysMap } from '@/types/plugin';
+import { Plugin, PluginID, PluginName, pluginKeysMap } from '@/types/plugin';
 
 import HomeContext from '@/pages/api/home/home.context';
 
@@ -97,13 +97,20 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           pluginKeys.find((key) => key.pluginId === pluginId)
             ?.requiredKeys.find((key) => key.key === keyName)?.value;
 
-        const getPluginChatBody = (pluginId: PluginID, chatBody: ChatBody, keys: any[]) => ({
-          ...chatBody,
-          ...keys.reduce((obj: { [x: string]: any; }, key: string | any) => {
-            obj[key] = getPluginKey(pluginId, key);
-            return obj;
-          }, {}),
-        });
+        const getPluginChatBody = (pluginId: PluginID, chatBody: ChatBody, keys: any[]) => {
+          const body = {
+            ...chatBody,
+            ...keys.reduce((obj: { [x: string]: any; }, key: string | any) => {
+              obj[key] = getPluginKey(pluginId, key);
+              return obj;
+            }, {}),
+          };
+          if (pluginId === PluginID.FILES_UPLOAD) {
+            body.docs = []; // add empty docs array
+          }
+          return body;
+        };
+
 
         const chatBody: ChatBody = {
           model: updatedConversation.model,
@@ -135,7 +142,9 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
         if (!response.ok) {
           homeDispatch({ field: 'loading', value: false });
           homeDispatch({ field: 'messageIsStreaming', value: false });
-          toast.error(await response.text());
+          const err_txt = await response.text()
+          toast.error(err_txt);
+          console.error(err_txt)
           return;
         }
         const data = response.body;
@@ -144,7 +153,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
           homeDispatch({ field: 'messageIsStreaming', value: false });
           return;
         }
-        if (!plugin) {
+        if (!plugin || plugin.name === PluginName.FILES_UPLOAD) {
           if (updatedConversation.messages.length === 1) {
             const { content } = message;
             const customName =

@@ -7,7 +7,7 @@ import { KeyValuePair } from '@/types/data';
 import { FolderType } from '@/types/folder';
 
 import { HomeInitialState } from './home.state';
-import { UploadFile } from '@/types/uploadfile';
+import { VectorStoreInfo } from '@/utils/server/vectorStore';
 
 export interface HomeContextProps {
   state: HomeInitialState;
@@ -21,8 +21,10 @@ export interface HomeContextProps {
     conversation: Conversation,
     data: KeyValuePair,
   ) => void;
-  handleUpdateUploadedFiles: (newFiles: UploadFile[]) => void;
-  handleDeleteFile: (fileId: string) => void;
+  // handleUpdateVectorStoreList: (VectorStoreList: VectorStoreInfo[]) => void;
+  refreshVectorStoresList: () => void;
+  handleToggleVectorStoreSelection: (vs: string) => void;
+
 }
 
 const HomeContext = createContext<HomeContextProps>(undefined!);

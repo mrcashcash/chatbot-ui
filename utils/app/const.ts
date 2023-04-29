@@ -25,10 +25,12 @@ export const AZURE_DEPLOYMENT_ID =
 
 export const UPLOAD_DIR = 'uploadedFiles'
 // Store 
-
-export const STORE_PATH = UPLOAD_DIR + '/store';
+export const STORE_ROOT_PATH = 'vectorstores';
+// export const STORE_PATH = UPLOAD_DIR + '/store';
 export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || ''
 export enum MSG_TYPE {
   FILES = 0,
-  URL = 1
+  URL = 1,
+  GITHUB_REPO = 2,
+  GOOGLE_SEARCH = 3,
 }
