@@ -15,27 +15,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<any>) => {
             return;
         }
 
-        // if (!fs.existsSync(uploadsDir)) {
-        //     fs.mkdirSync(uploadsDir, { recursive: true });
-        // }
         const vs = await VectorStore.getVectorStoreInfo()
-        // const fileNames = fs.readdirSync(uploadsDir);
-        // const filesOnly = fileNames.filter((name) => {
-        //     const filePath = path.join(uploadsDir, name);
-        //     return fs.statSync(filePath).isFile();
-        // });
-
-        // const uploadFilesList = filesOnly.map((fileName) => {
-        //     const filePath = path.join(uploadsDir, fileName);
-        //     const fileStats = fs.statSync(filePath);
-
-        //     return {
-        //         id: fileName,
-        //         name: fileName,
-        //         size: fileStats.size,
-        //         type: '', // You can use a library like 'mime-types' to detect the file type based on the file extension.
-        //     };
-        // });
 
         res.status(200).json(vs);
     } catch (error) {

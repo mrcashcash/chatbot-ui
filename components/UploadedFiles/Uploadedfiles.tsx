@@ -3,14 +3,11 @@ import { useTranslation } from 'react-i18next';
 import HomeContext from '@/pages/api/home/home.context';
 import { FilesList } from './FilesList';
 import { UploadFile } from '@/types/uploadfile';
-import { IconFileUpload, IconUpload, IconFolderPlus, IconBrandGithub, IconBrandGoogle, IconExternalLink } from '@tabler/icons-react';
+import { IconFileUpload, IconFolderPlus, IconBrandGithub, IconBrandGoogle, IconExternalLink } from '@tabler/icons-react';
 import Spinner from '../Spinner';
-import { VectorStoreInfo } from '@/utils/server/vectorStore';
 import { toast } from 'react-hot-toast';
 import CustomInputModal from './CustomInputModal'; // Import the new modal component
 import { MSG_TYPE } from '@/utils/app/const';
-import { AudioRecorder } from '../Recorder/Recorder';
-
 
 const UploadedFile = () => {
     const { t } = useTranslation('uploadedfiles');
@@ -23,7 +20,8 @@ const UploadedFile = () => {
     const [inputLabel2, setInputLabel2] = useState('');
     const {
         state: { VectorStoresList },
-        dispatch: homeDispatch, refreshVectorStoresList
+        dispatch: homeDispatch,
+        refreshVectorStoresList
     } = useContext(HomeContext);
     const openModalWithLabels = (inputType: MSG_TYPE, label1: string, label2: string) => {
         setInputType(inputType)
@@ -125,7 +123,10 @@ const UploadedFile = () => {
 
 
     };
-
+    // useEffect(() => {
+    //     // Fetch the initial VectorStoresList from the server
+    //     refreshVectorStoresList();
+    // }, []);
     return (
         <div className="flex flex-col items-center space-y-1 border-t border-white/20 pt-1 text-sm">
 
@@ -188,6 +189,7 @@ const UploadedFile = () => {
                     closeModal={() => setShowModal(false)}
                     inputLabel1={inputLabel1}
                     inputLabel2={inputLabel2}
+                    VectorStoresList={VectorStoresList}
                     handleFormValues={handleModalSubmit} // Make sure this line is present
                 />
             )}

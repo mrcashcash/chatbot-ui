@@ -10,14 +10,39 @@ interface AudioRecorderProps {
     onStopRecording: () => void;
     onStartRecording: () => void;
     resetSignal: boolean;
+    contentChangedByUser: boolean
+    // onSendCommand: () => void;
 }
 export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     onUpdateTranscript,
     onStopRecording,
     onStartRecording,
-    resetSignal }) => {
+    resetSignal,
+    contentChangedByUser
+    // onSendCommand
+}) => {
+
+    const commands = [
+        {
+            command: 'mickey send',
+            callback: () => {
+                handleSendCommand();
+                stopRecording();
+            },
+            isFuzzyMatch: true,
+            fuzzyMatchingThreshold: 0.8,
+        }
+    ];
+    let transcriptToSend = ''
     const [isRecording, setIsRecording] = useState(false);
-    const { transcript, resetTranscript } = useSpeechRecognition();
+    const { transcript, resetTranscript, isMicrophoneAvailable } = useSpeechRecognition({ commands });
+
+
+    const handleSendCommand = () => {
+        const filteredTranscript = transcript.replace(/\bmickey send\b/gi, '').trim();
+        onUpdateTranscript(filteredTranscript);
+
+    };
 
     const toggleRecording = () => {
         if (isRecording) {
@@ -43,17 +68,30 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         console.log("Rcorder:Stop Recording...")
         setIsRecording(false);
         SpeechRecognition.stopListening();
-        onUpdateTranscript(transcript);
+        // onUpdateTranscript(transcript);
         resetTranscript();
         onStopRecording();
     };
-    useEffect(() => {
-        if (isRecording) {
-            onUpdateTranscript(transcript);
-            console.log("Recorder:uEff:[transcript, onUpdateTranscript, isRecording]")
-        }
-    }, [transcript, onUpdateTranscript, isRecording]);
+    // useEffect(() => {
+    //     if (contentChangedByUser) {
+    //         resetTranscript();
+    //     }
+    // }, [content, contentChangedByUser, resetTranscript]);
 
+    useEffect(() => {
+        let modifiedTranscript = transcript;
+
+        if (transcript.includes('delete')) {
+            const words = transcript.split(' ');
+            const indexToDelete = words.findIndex((word) => word === 'delete') - 1;
+            if (indexToDelete >= 0) {
+                words.splice(indexToDelete, 2); // Remove 'delete' and the word before it
+                modifiedTranscript = words.join(' ');
+            }
+        }
+
+        onUpdateTranscript(modifiedTranscript);
+    }, [transcript, onUpdateTranscript]);
     // useEffect(() => {
     //     console.log("Recorder:uEff:[resetSignal, resetTranscript]-resetSignal-main-before-true?")
     //     if (resetSignal) {

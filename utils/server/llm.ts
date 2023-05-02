@@ -1,5 +1,3 @@
-import { OpenAI } from 'langchain/llms/openai';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { TextLoader } from 'langchain/document_loaders/fs/text';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
 import { JSONLinesLoader, JSONLoader } from 'langchain/document_loaders/fs/json';
@@ -13,7 +11,6 @@ import { CheerioWebBaseLoader } from 'langchain/document_loaders/web/cheerio';
 import { embedDocs } from './vectorStore';
 import { MSG_TYPE, UPLOAD_DIR } from '../app/const';
 import { SelectorType } from 'cheerio';
-import fs from 'fs/promises';
 
 const uploadDir = path.join(process.cwd(), UPLOAD_DIR);
 type FileLoaders = {
@@ -56,7 +53,7 @@ export const processingData = async (type: MSG_TYPE, values: string[]): Promise<
     } else if (type === MSG_TYPE.GITHUB_REPO && values) {
         let git_link = values[0]
         let branch = values[1]
-        branch = branch != "" ? branch : 'main'
+        // branch = branch != "" ? branch : 'main'
         console.log("Git_Link: ", git_link)
         const loader = new GithubRepoLoader(git_link, { accessToken: process.env.GITHUB_TOKEN, branch: branch, unknown: "warn", recursive: true })
         const docs = await loader.load();

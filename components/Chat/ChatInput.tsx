@@ -57,6 +57,7 @@ export const ChatInput = ({
   const prevTranscriptRef = useRef<string>('');
   const originalContentRef = useRef<string>('');
   const [resetTranscriptSignal, setResetTranscriptSignal] = useState(false);
+  const [contentChangedByUser, setContentChangedByUser] = useState(false);
 
 
   const [isRecording, setIsRecording] = useState(false);
@@ -89,7 +90,7 @@ export const ChatInput = ({
       );
       return;
     }
-
+    setContentChangedByUser(true);
     setContent(value);
     updatePromptListVisibility(value);
   };
@@ -242,7 +243,18 @@ export const ChatInput = ({
       setContent(originalContentRef.current + ' ' + transcript.trim());
       prevTranscriptRef.current = transcript;
     }
+
   }
+  // const handleSendCommand = () => {
+  //   if (content) {
+  //     const newContent = content.replace(/send/i, "").trim();
+  //     setContent(newContent);
+  //     setIsRecording(false);
+  //     // handleSend()
+
+  //   }
+
+  // };
 
   useEffect(() => {
     if (promptListRef.current) {
@@ -251,24 +263,20 @@ export const ChatInput = ({
   }, [activePromptIndex]);
 
   useEffect(() => {
-    if (isRecording) {
-      setResetTranscriptSignal(true);
-      setTimeout(() => {
-        setResetTranscriptSignal(false);
-      }, 100);
-    }
+
     console.log("Parent:uEff:[content, isRecording]")
 
     if (!isRecording) {
       originalContentRef.current = content as string;
       console.log("Parent:uEff:[content, isRecording]-!isRecording-content:", content)
 
-    } else {
-      setResetTranscriptSignal(true);
-      setTimeout(() => {
-        setResetTranscriptSignal(false);
-      }, 100);
     }
+    // else {
+    //   setResetTranscriptSignal(true);
+    //   setTimeout(() => {
+    //     setResetTranscriptSignal(false);
+    //   }, 100);
+    // }
     if (textareaRef && textareaRef.current) {
       textareaRef.current.style.height = 'inherit';
       textareaRef.current.style.height = `${textareaRef.current?.scrollHeight}px`;
@@ -376,14 +384,19 @@ export const ChatInput = ({
 
           {!messageIsStreaming &&
             <AudioRecorder
+              contentChangedByUser={contentChangedByUser}
               onUpdateTranscript={handleTranscript}
-              onStartRecording={() => setIsRecording(true)}
+              onStartRecording={() => {
+                setContentChangedByUser(false);
+                setIsRecording(true)
+              }}
               onStopRecording={() => {
                 originalContentRef.current = '';
                 prevTranscriptRef.current = '';
                 setIsRecording(false)
               }}
               resetSignal={resetTranscriptSignal}
+            // onSendCommand={handleSendCommand}
             />}
           <button
             className="absolute right-2 top-2 rounded-sm p-1 text-neutral-800 opacity-60 hover:bg-neutral-200 hover:text-neutral-900 dark:bg-opacity-50 dark:text-neutral-100 dark:hover:text-neutral-200"

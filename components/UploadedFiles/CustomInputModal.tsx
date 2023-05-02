@@ -1,4 +1,5 @@
 import { MSG_TYPE } from '@/utils/app/const';
+import { VectorStoreInfo } from '@/utils/server/vectorStore';
 import React, { useState } from 'react';
 
 interface CustomInputModalProps {
@@ -7,17 +8,20 @@ interface CustomInputModalProps {
     closeModal: () => void;
     inputLabel1: string;
     inputLabel2: string;
+    VectorStoresList: VectorStoreInfo[]
     handleFormValues: (inputType: MSG_TYPE, inputValue1: string, inputValue2: string, inputValue3: string) => void;
 
 }
 
-const CustomInputModal: React.FC<CustomInputModalProps> = ({ inputType, showModal, closeModal, inputLabel1, inputLabel2, handleFormValues }) => {
+const CustomInputModal: React.FC<CustomInputModalProps> = ({ inputType, showModal, closeModal, inputLabel1, inputLabel2, VectorStoresList, handleFormValues }) => {
     const [inputValue1, setInputValue1] = useState('');
     const [inputValue2, setInputValue2] = useState('');
-    const [inputValue3, setInputValue3] = useState('');
+    const [inputValue3, setInputValue3] = useState('New');
     const [inputError1, setInputError1] = useState(''); // New error state
     const [inputError2, setInputError2] = useState(''); // New error state
     const [inputError3, setInputError3] = useState(''); // New error state
+    const [customVectorStoreName, setCustomVectorStoreName] = useState(''); // New state for custom VectorStore name
+
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,9 +53,14 @@ const CustomInputModal: React.FC<CustomInputModalProps> = ({ inputType, showModa
         } else {
             setInputError3('');
         }
-
+        if (inputValue3 === "New" && (!customVectorStoreName || !stringNoSymbolsOrSpaces.test(customVectorStoreName))) {
+            setInputError3('New VectorStore Name is required and must contain only characters and numbers (no symbols or spaces).');
+            isValid = false;
+        } else {
+            setInputError3('');
+        }
         if (isValid) {
-            handleFormValues(inputType, inputValue1, inputValue2, inputValue3);
+            handleFormValues(inputType, inputValue1, inputValue2, inputValue3 === "New" ? customVectorStoreName : inputValue3);
             closeModal();
         }
     };
@@ -85,8 +94,32 @@ const CustomInputModal: React.FC<CustomInputModalProps> = ({ inputType, showModa
                         />
                         {inputError2 && <p className="mt-1 text-xs text-red-600">{inputError2}</p>}
                     </div>}
-
                     <div className="mb-3">
+                        <label className="block text-sm font-semibold mb-1">VectorStore Name:</label>
+                        <select
+                            value={inputValue3}
+                            onChange={(e) => setInputValue3(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-600 rounded text-neutral-100 dark:text-gray-900 mb-1"
+                        >
+                            {VectorStoresList.map((vectorStore) => (
+                                <option key={vectorStore.name} value={vectorStore.name}>{vectorStore.name}</option>
+                            ))}
+                            <option value="New">New</option>
+                        </select>
+                        {inputError3 && <p className="mt-1 text-xs text-red-600">{inputError3}</p>}
+                    </div>
+                    {inputValue3 === "New" && (
+                        <div className="mb-3">
+                            <label className="block text-sm font-semibold mb-1">New VectorStore Name:</label>
+                            <input
+                                type="text"
+                                value={customVectorStoreName}
+                                onChange={(e) => setCustomVectorStoreName(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-600 rounded text-neutral-100 dark:text-gray-900"
+                            />
+                        </div>
+                    )}
+                    {/* <div className="mb-3">
                         <label className="block text-sm font-semibold mb-1">VectorStore Name:</label>
                         <input
                             type="text"
@@ -95,7 +128,7 @@ const CustomInputModal: React.FC<CustomInputModalProps> = ({ inputType, showModa
                             className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-600 rounded text-neutral-100 dark:text-gray-900"
                         />
                         {inputError3 && <p className="mt-1 text-xs text-red-600">{inputError3}</p>}
-                    </div>
+                    </div> */}
                     <div className="flex justify-end">
                         <button
                             type="button"
