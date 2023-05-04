@@ -46,7 +46,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             llm,
             vs.asRetriever(3)
         );
-        chain.verbose = false;
+        chain.verbose = true;
         const followUpRes = await chain.call({
             question: query,
             chat_history: messagesArray,
