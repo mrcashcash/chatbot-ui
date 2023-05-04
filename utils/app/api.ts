@@ -10,7 +10,8 @@ export const getEndpoint = (plugin: Plugin | null) => {
     return 'api/google';
   }
   if (plugin.id === PluginID.FILES_UPLOAD) {
-    return 'api/query';
+    return 'api/query_agent'
+    // return 'api/query';
   }
   if (plugin.id === PluginID.WEB_SCRAPE) {
     return 'api/webscrape';
