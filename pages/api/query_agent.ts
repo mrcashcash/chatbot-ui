@@ -1,64 +1,55 @@
-import { OpenAIChat } from "langchain/llms/openai";
-import { NextApiRequest, NextApiResponse } from "next";
 import { ChatBody } from '@/types/chat';
-import { ConversationalRetrievalQAChain } from "langchain/chains";
-import { OPENAI_API_KEY } from "@/utils/app/const";
-import { VectorStore } from "@/utils/server/vectorStore";
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    try {
-        const { messages, key, model, prompt, temperature } =
-            req.body as ChatBody;
-        const userMessage = messages[messages.length - 1];
-        const messagesArray = messages.map(
-            (message) => `${message.role}:${message.content}`
-        );
+    console.log('beginning GET handler');
+    const { messages, key, model, prompt, temperature } =
+        req.body as ChatBody;
+    const userMessage = messages[messages.length - 1];
+    console.log('handler chatfile query: ', userMessage);
 
-        const chat_history = messages.pop();
-        const query = userMessage.content.trim();
-        let firstQuestionMarkEncountered = false;
-        const llm = new OpenAIChat({
-            modelName: model.id,
-            openAIApiKey: OPENAI_API_KEY,
-            temperature: temperature,
-            streaming: true,
-            callbacks: [
-                {
-                    handleLLMNewToken(token: string) {
-                        if (firstQuestionMarkEncountered) {
-                            res.write(token.toString());
-                        } else if (token === '?') {
-                            firstQuestionMarkEncountered = true;
-                            process.stdout.write(token)
-                        } else {
-                            process.stdout.write(token)
-                        }
-                    },
-                },
-            ],
+    if (userMessage) {
+        let queryString = [
+            `message=${userMessage.content}`,
+            // `param2=${getParam(2)}`,
+            // `param3=${getParam(3)}`,
+        ].join('&');
+        const streamUrl = `http://127.0.0.1:5000/query?${queryString}`;
 
+        try {
+            const response = await fetch(streamUrl);
 
-        });
-        process.stdout.write('\n')
-        const vs = await VectorStore.getInstance("langchain-js");
-        const chain = ConversationalRetrievalQAChain.fromLLM(
-            llm,
-            vs.asRetriever(3)
-        );
-        chain.verbose = false;
-        const followUpRes = await chain.call({
-            question: query,
-            chat_history: messagesArray,
-        });
-        res.end()
-        res.status(200)
+            if (response.ok) {
 
+                if (response.body) {
+                    const reader = response.body.getReader()
+                    const decoder = new TextDecoder("utf-8");
 
+                    while (true) {
+                        const { value, done } = await reader.read();
+                        if (done) break;
+                        const token = decoder.decode(value);
+                        res.write(token)
+                    }
+                    res.status(200).end()
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error: TEST AI");
+                } else {
+                    console.error('Error fetching stream: response body is null');
+                    return new Response('Error fetching stream', { status: 500, });
+                }
+                //         // return res.status(200)
+            } else {
+                console.error('Error fetching stream:', response.statusText);
+                return new Response('Error fetching stream', { status: response.status, });
+            }
+        } catch (error) {
+            console.error('Error fetching stream:', error);
+            return new Response('Error fetching stream', { status: 500, });
+        }
+    } else {
+        return new Response('Invalid message parameter', { status: 400, });
     }
 };
+
 export default handler;
