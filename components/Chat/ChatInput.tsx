@@ -386,7 +386,7 @@ export const ChatInput = ({
           rel="noreferrer"
           className="underline"
         >
-          ChatWeb
+          ChatWeb by Happy
         </a>
         .{' '}
         {t(
