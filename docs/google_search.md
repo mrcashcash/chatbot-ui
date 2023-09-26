@@ -1,6 +1,6 @@
 # Google Search Tool
 
-Use the Google Search API to search the web in ChatWeb.
+Use the Google Search API to search the web in Chatbot UI.
 
 ## How To Enable
 

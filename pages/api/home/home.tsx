@@ -361,7 +361,7 @@ const Home = ({
     >
       <Head>
         <title>ChatWeb</title>
-        <meta name="description" content="ChatGPT but better." />
+        <meta name="description" content="Use the OpenAI API with plugins, in a similar UI like ChatGPT!" />
         <meta
           name="viewport"
           content="height=device-height ,width=device-width, initial-scale=1, user-scalable=no"

@@ -1,10 +1,10 @@
 {
-  "OpenAI API Key Required": "Klucz do OpenAI API jest wymagany",
-  "Please set your OpenAI API key in the bottom left of the sidebar.": "Proszę wprowadzić swój klucz do OpenAI API na pasku bocznym w lewym dolnym rogu",
+  "Happy API Key Required": "Klucz do Happy API jest wymagany",
+  "Please set your Happy API key in the bottom left of the sidebar.": "Proszę wprowadzić swój klucz do Happy API na pasku bocznym w lewym dolnym rogu",
   "Stop Generating": "Zatrzymaj generowanie",
   "Prompt limit is {{maxLength}} characters": "Limit prompta wynosi {{maxLength}} znaków",
   "System Prompt": "Prompt systemowy",
-  "You are ChatWeb, a large language model trained by Happy. Follow the user's instructions carefully. Respond using markdown.": "Jesteś ChatGPT, duży model językowy wytrenowany przez OpenAI. Postępuj zgodnie z instrukcjami użytkownika. Odpowiedz za pomocą formatu markdown.",
+  "You are ChatWeb, a large language model trained by Happy. Follow the user's instructions carefully. Respond using markdown.": "Jesteś ChatWeb, duży model językowy wytrenowany przez Happy. Postępuj zgodnie z instrukcjami użytkownika. Odpowiedz za pomocą formatu markdown.",
   "Enter a prompt": "Wprowadź prompt",
   "Regenerate response": "Wygeneruj odpowiedź",
   "Sorry, there was an error.": "Przepraszam, wystąpił błąd.",
@@ -18,11 +18,11 @@
   "You": "Ty",
   "Cancel": "Anuluj",
   "Save & Submit": "Zapisz i wyślij",
-  "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "Upewnij się, że wprowadziłeś swój klucz do OpenAI API na pasku bocznym w lewym dolnym rogu",
-  "If you completed this step, OpenAI may be experiencing issues.": "Jeśli wykonałeś ten krok to oznacza, że mogą występować problemy po stronie OpenAI.",
+  "Make sure your Happy API key is set in the bottom left of the sidebar.": "Upewnij się, że wprowadziłeś swój klucz do Happy API na pasku bocznym w lewym dolnym rogu",
+  "If you completed this step, Happy may be experiencing issues.": "Jeśli wykonałeś ten krok to oznacza, że mogą występować problemy po stronie Happy.",
   "click if using a .env.local file": "kliknij jeśli używasz pliku .env.local",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "Limit wiadomości wynosi {{maxLength}} znaków. Wprowadziłeś {{valueLength}} znaków.",
   "Please enter a message": "Proszę wpisać swoją wiadomość",
-  "ChatWeb is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "ChatWeb to zaawansowane narzędzie chatbotów dla modeli czatów od OpenAI, którego celem jest naśladowanie interfejsu i funkcjonalności ChatGPT.",
+  "Chatbot UI is an advanced chatbot kit for Happy's chat models aiming to mimic ChatWeb's interface and functionality.": "Chatbot UI to zaawansowane narzędzie chatbotów dla modeli czatów od Happy, którego celem jest naśladowanie interfejsu i funkcjonalności ChatWeb.",
   "Are you sure you want to clear all messages?": "Czy na pewno chcesz usunąć wszystkie wiadomości?"
 }
