@@ -361,7 +361,7 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             Welcome to ChatWeb
           </div>
           <div className="text-center text-lg text-black dark:text-white">
-            <div className="mb-8">{`ChatWeb is an open source clone of OpenAI's ChatGPT UI, with a plugins feature so the OpenAI API can be used with some plugins.`}</div>
+            <div className="mb-8">{`ChatWeb is a clone of OpenAI's ChatGPT UI, with a plugins feature so the OpenAI API can be used with some plugins.`}</div>
             <div className="mb-2 font-bold">
               Important: ChatWeb is 100% unaffiliated with OpenAI.
             </div>
@@ -370,26 +370,6 @@ export const Chat = memo(({ stopConversationRef }: Props) => {
             <div className="mb-2">
               ChatWeb allows you to plug in your API key to use this UI with
               any GPT API.
-            </div>
-            <div className="mb-2">
-              It is <span className="italic">only</span> used to communicate
-              with their API.
-            </div>
-            <div className="mb-2">
-              {t(
-                'Please set your Skailar API key in the bottom left of the sidebar.',
-              )}
-            </div>
-            <div>
-              {t("If you don't have an Skailar API key, you can get one here: ")}
-              <a
-                href="https://discord.gg/skailar"
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-500 hover:underline"
-              >
-                discord.gg/skailar
-              </a>
             </div>
           </div>
         </div>
