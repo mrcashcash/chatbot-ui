@@ -1,3 +1,39 @@
+# Call Anthropic, Cohere, Azure, TogetherAI, Replicate, etc. 
+Call 100+ LLM APIs without changing Chat-UI's code. 
+
+Steps: 
+1. Create an OpenAI-compatible server to handle LLM API calling.
+
+We can use [LiteLLM's](https://github.com/BerriAI/litellm) Docker image to spin up an OpenAI Proxy Server
+
+```
+git clone https://github.com/BerriAI/litellm.git
+```
+
+Add your API keys / LLM configs to template_secrets.toml.
+```
+[keys]
+OPENAI_API_KEY="sk-..."
+COHERE_API_KEY="Wa-..."
+```
+[All Configs](https://github.com/BerriAI/litellm/blob/main/secrets_template.toml)
+
+Run Docker image:
+```
+docker build -t litellm . && docker run -p 8000:8000 litellm
+
+## INFO: OpenAI Proxy server running on http://0.0.0.0:8000
+```
+
+
+2. Point Chatbot-UI to the server 
+Set API Key + Base in `.env`:
+```
+OPENAI_API_KEY="my-fake-key"
+OPENAI_API_HOST="http://0.0.0.0:8000
+```
+
+
 # Chatbot UI
 
 Chatbot UI is an open source chat UI for AI models.
