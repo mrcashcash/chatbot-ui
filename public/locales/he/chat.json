@@ -1,10 +1,10 @@
 {
-  "OpenAI API Key Required": "מפתח openAI API",
-  "Please set your OpenAI API key in the bottom left of the sidebar.": "עליך להזין את המפתח האישי שלך בצידו השמאלי התחתון של תפריט הניווט.",
+  "Happy API Key Required": "מפתח Happy API",
+  "Please set your Happy API key in the bottom left of the sidebar.": "עליך להזין את המפתח האישי שלך בצידו השמאלי התחתון של תפריט הניווט.",
   "Stop Generating": "עצור תהליך הפקת התשובה",
   "Prompt limit is {{maxLength}} characters": "אורך התשובה מוגבל ל {{maxLength}} תווים",
   "System Prompt": "הגדרת בסיס לכל תשובה של המערכת",
-  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.": "You are Hebrew speaking ChatGPT, a large language model trained by OpenAI which responds in Hebrew to any question or User comment. Follow the user's instructions carefully. Respond in Hebrew using markdown.",
+  "You are ChatWeb, a large language model trained by Happy. Follow the user's instructions carefully. Respond using markdown.": "You are Hebrew speaking ChatWeb, a large language model trained by Happy which responds in Hebrew to any question or User comment. Follow the user's instructions carefully. Respond in Hebrew using markdown.",
   "Enter a prompt": "הקלד הודעה",
   "Regenerate response": "הפק תשובה מחדש",
   "Sorry, there was an error.": "התנצלותנו הכנה, המערכת מדווחת על תקלה",
@@ -18,11 +18,11 @@
   "You": "אתה",
   "Cancel": "Cancel",
   "Save & Submit": "Save & Submit",
-  "Make sure your OpenAI API key is set in the bottom left of the sidebar.": "עליך לוודא שמפתח האישי שלך מוזן בתפריט מצד שמאל",
-  "If you completed this step, OpenAI may be experiencing issues.": "אם טרם השלמת חלק זה יש סבירות גבוהה להתרחשות תקלה",
+  "Make sure your Happy API key is set in the bottom left of the sidebar.": "עליך לוודא שמפתח האישי שלך מוזן בתפריט מצד שמאל",
+  "If you completed this step, Happy may be experiencing issues.": "אם טרם השלמת חלק זה יש סבירות גבוהה להתרחשות תקלה",
   "click if using a .env.local file": "click if using a .env.local file",
   "Message limit is {{maxLength}} characters. You have entered {{valueLength}} characters.": "מגבלת תווים היא {{maxLength}}. אתה הקלדת עד עכשיו {{valueLength}} תווים.",
   "Please enter a message": "הקלד את הודעתך",
-  "Chatbot UI is an advanced chatbot kit for OpenAI's chat models aiming to mimic ChatGPT's interface and functionality.": "מערכת הצאטבוט היא ערכה מתקדמת לניהול שיחה המכוונת לחקות את המראה והפונקציונאלית של ChatGPT",
+  "Chatbot UI is an advanced chatbot kit for Happy's chat models aiming to mimic ChatWeb's interface and functionality.": "מערכת הצאטבוט היא ערכה מתקדמת לניהול שיחה המכוונת לחקות את המראה והפונקציונאלית של ChatWeb",
   "Are you sure you want to clear all messages?": "האם אתה בטוח שברצונך למחוק את כל ההודעות?"
 }

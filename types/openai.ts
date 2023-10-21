@@ -49,4 +49,26 @@ export const OpenAIModels: Record<OpenAIModelID, OpenAIModel> = {
     maxLength: 96000,
     tokenLimit: 32000,
   },
+  [OpenAIModelID.GPT_3_5_16K]: {
+    id: OpenAIModelID.GPT_3_5_16K,
+    name: 'GPT-3.5-16K',
+    maxLength: 64000,
+    tokenLimit: 16000,
+  },
 };
+
+export interface OpenAIFunction {
+  name: string;
+  description: string;
+  parameters: {
+    type: string;
+    properties: {
+      [key: string]: {},
+    },
+    required: string[];
+  };
+}
+
+export interface OpenAIFunctionList {
+  [name: string]: OpenAIFunction;
+}
